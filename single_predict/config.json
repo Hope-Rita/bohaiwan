@@ -1,0 +1,23 @@
+{
+  "data-parameters": {
+      "pred-len": 14,
+      "future-days": 14
+  },
+  "model-parameters": {
+      "lstm": {
+          "model-hidden-size": 35,
+          "num-workers": 0,
+          "batch-size": 16,
+          "learning-rate": 1,
+          "epoch-num": 300
+      },
+      "mlp": {
+          "hidden-size": [17, 9]
+      }
+  },
+  "predict-target": "taseometer",
+  "device": {
+      "cuda": "cuda:0",
+      "cpu": "cpu"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "model-parameters": {
+      "lstm": {
+          "model-hidden-size": 35,
+          "num-workers": 0,
+          "batch-size": 16,
+          "learning-rate": 1,
+          "epoch-num": 300
+      },
+      "mlp": {
+          "hidden-size": [17, 9]
+      }
+  },
+  "predict-target": "taseometer",
+  "predict-result": {
+      "result": "/home/lwt/bohaiwan/env_factors/result",
+      "result2": "/home/lwt/bohaiwan/env_factors/result2"
+  },
+  "device": {
+      "cuda": "cuda:0",
+      "cpu": "cpu"
+  },
+  "col-match": {
+      "local": "C:\\study\\WorkSpace\\bohaiwan\\env_factors\\col_matched.json",
+      "server": "/home/lwt/bohaiwan/env_factors/col_matched.json"
+  }
+}
