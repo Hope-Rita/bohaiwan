@@ -80,7 +80,7 @@ def load_every_col(filename):
     return ld.load_every_col(filename, cols=get_valid_cols(frame.columns[1:]), load_func=gen_data, random_pick=True)
 
 
-def load_one_cols(filename):
+def load_cols(filename):
     """
     分别导入各列数据，并进行划分（随机选取）
     :param filename: 存放数据的 csv 文件路径
@@ -90,7 +90,7 @@ def load_one_cols(filename):
     return ld.load_cols(filename, cols=get_valid_cols(frame.columns[1:]), load_func=gen_data, random_pick=True)
 
 
-def load_one_col(filename, col, add_date):
+def load_one_col(filename, col, add_date=False):
     if add_date:
         x, y, dates = gen_data(filename, col, add_date)
     else:

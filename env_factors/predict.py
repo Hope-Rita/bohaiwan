@@ -6,6 +6,7 @@
 """
 
 
+import utils.pred_utils as pu
 from baseline import lr
 from baseline import mlp
 from baseline import svr
@@ -20,10 +21,26 @@ from utils.config import get_config
 result_dir, result2_dir = get_config('config.json', 'predict-result', inner_keys=['result', 'result2'])
 
 
-def supervised_model(filename, func, one_col=False):
+def scheme3(filename):
+    """
+    方案3：采用多个模型分别对每一列进行训练和测试
+    :param filename: 存放数据的文件
+    """
+    data = gen_dataset.load_cols(filename)
 
-    if one_col:
-        x_train, y_train, x_test, y_test, normal_y = gen_dataset.load_one_col(filename, col)
+    for func in [lr.lr_predict, svr.svr_predict, xgb.xgb_predict, mlp.mlp_predict]:
+        predict_one_cols(func, data, filename)
+
+
+def supervised_model(filename, func, col=None):
+    """
+    使用有监督学习的模型进行预测
+    :param filename: 存放数据的文件
+    :param func: 使用的模型
+    :param col: 若为 None 则预测所有的列，否则预测特定的列
+    """
+    if col:
+        x_train, y_train, x_test, y_test, normal_y = gen_dataset.load_one_col(filename, col=None)
     else:
         x_train, y_train, x_test, y_test, normal_y = gen_dataset.load_all(filename)
 
@@ -37,15 +54,24 @@ def supervised_model(filename, func, one_col=False):
     print(metric.all_metric(y_test, pred))
 
 
-def all_supervised_models(filename):
-    # x_train, y_train, x_test, y_test, normal_y = gen_dataset.load_all(filename)
-    x_train, y_train, x_test, y_test = gen_dataset.load_all(filename)
+def all_supervised_models(filename, normal=False):
+    """
+    使用所有的有监督学习模型进行预测
+    :param filename: 存放数据的文件
+    :param normal: 是否进行归一化
+    """
+    normal_y = None
+    if normal:
+        x_train, y_train, x_test, y_test, normal_y = gen_dataset.load_all(filename)
+    else:
+        x_train, y_train, x_test, y_test = gen_dataset.load_all(filename)
+
     for func in [lr.lr_predict, svr.svr_predict, xgb.xgb_predict, mlp.mlp_predict]:
         pred = func(x_train, y_train, x_test)
 
-        # 反归一化
-        # pred = normal_y.inverse_transform(pred)
-        # y_test = normal_y.inverse_transform(y_test)
+        if normal:  # 反归一化
+            pred = normal_y.inverse_transform(pred)
+            y_test = normal_y.inverse_transform(y_test)
 
         print(func.__name__, filename)
         print(metric.all_metric(y_test, pred))
@@ -75,34 +101,25 @@ def predict_every_col(filename):
         print('完成预测，已写入', csv_name)
 
 
-def predict_one_cols(filename):
-    data = gen_dataset.load_one_cols(filename)
+def predict_one_cols(func, data, filename):
+    """
+    用给定的模型对每一列的数据分别进行预测
+    :param func: 使用的模型
+    :param data: 预测使用的数据，格式为字典
+    :param filename: 存放数据的文件
+    """
+    print(f'模型: {func.__name__}')
 
-    for func in [lr, svr, xgb, mlp]:
-        print('模型：', func.__name__)
+    # 进行训练，得到每一列数据的预测指标
+    cols_metrics = pu.predict_one_cols(func, data)
 
-        result_list = []
-
-        for key in data:
-            pred = direct_predict(func, x_train=data[key][0], y_train=data[key][1], x_test=data[key][2])
-
-            d = {'Column': key}
-            metric_dict = metric.all_metric(y=data[key][3], pred=pred.reshape(-1))
-            d.update(metric_dict)
-            result_list.append(d)
-
-        # 写到 CSV 文件里
-        csv_name = func.__name__.split('.')[-1] + '_' + filename.split('/')[-1]
-        data_process.dump_csv(result2_dir, csv_name, result_list)
-        print('完成预测，已写入', csv_name)
-
-
-def direct_predict(func, x_train, y_train, x_test):
-    model = func.model_fit(x_train, y_train)
-    return model.predict(x_test)
+    # 把指标写到 CSV 文件里
+    csv_name = func.__name__.split('_')[0] + '_' + filename.split('/')[-1]
+    data_process.dump_csv(result2_dir, csv_name, cols_metrics)
+    print('完成预测，已写入', csv_name)
 
 
 if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
-    predict_one_cols(pred_target_filename)
+    scheme3(pred_target_filename)

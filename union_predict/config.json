@@ -21,6 +21,9 @@
       "result1": "/home/lwt/bohaiwan/union_predict/result1",
       "result2": "/home/lwt/bohaiwan/union_predict/result2"
   },
+  "section-pred-result": {
+
+  },
   "device": {
       "cuda": "cuda:1",
       "cpu": "cpu"
