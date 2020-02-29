@@ -17,7 +17,6 @@ def predict_one_cols(func, data):
 
     result_list = []
     for column in data:
-
         # 调用模型进行预测，得到预测结果
         pred = func(x_train=data[column][0], y_train=data[column][1], x_test=data[column][2])
 

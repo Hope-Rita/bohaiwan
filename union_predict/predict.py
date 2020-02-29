@@ -42,7 +42,7 @@ def predict_every_col(filename):
 
         # 写到 CSV 文件里
         csv_name = func.__name__.split('.')[-1] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
-        data_process.dump_csv(res_dir1, csv_name, result_list, avg=avg)
+        data_process.dump_csv(res_dir1, csv_name, result_list, avg=data_process.avg)
 
 
 def scheme2(filename):
@@ -81,11 +81,6 @@ def predict_all_data(func, filename):
     pred = func(x_train, y_train, x_test)
     print(func.__name__, filename, gen_dataset.future_days)
     print(metric.all_metric(y_test, pred))
-
-
-def avg(series):
-    series = series.dropna()
-    return sum(series) / len(series)
 
 
 if __name__ == '__main__':

@@ -18,8 +18,8 @@
       }
   },
   "predict-result": {
-      "result1": "/home/lwt/bohaiwan/union_predict/result1",
-      "result2": "/home/lwt/bohaiwan/union_predict/result2"
+      "result1": "/home/lwt/bohaiwan/union_predict/section_result1",
+      "result2": "/home/lwt/bohaiwan/union_predict/section_result2"
   },
   "device": {
       "cuda": "cuda:1",

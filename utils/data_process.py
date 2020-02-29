@@ -38,3 +38,13 @@ def dump_csv(dirname, filename, data, avg=None):
         print('PCC', avg(df.loc[:, 'PCC']))
 
     print()
+
+
+def avg(series):
+    """
+    计算一个序列的平均值
+    :param series: 序列，格式为 pandas.Series
+    :return: 把空值去掉之后的平均值
+    """
+    series = series.dropna()
+    return sum(series) / len(series)

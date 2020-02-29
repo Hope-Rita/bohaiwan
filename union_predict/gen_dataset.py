@@ -124,9 +124,17 @@ def load_all(filename):
     return ld.load_all(filename, cols=frame.columns[1:], load_func=gen_data)
 
 
-def load_section(filename):
+def load_section(filename, section):
+    """
+    加载一个 section 中所有列的 section 数据集
+    section 数据集指的是，针对给定的 col，与它在同一个 section 上所有列上的时间序列所组成的数据集
+    :param filename: 存放数据的文件
+    :param section: section 名，格式为 SXX
+    :return: dict(key=col_name, value=section_data)
+    """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_cols(filename, frame.columns[1:], load_func=gen_section_data)
+    section_members = get_section_members(section, frame.columns[1:])
+    return ld.load_cols(filename, cols=section_members, load_func=gen_section_data)
 
 
 def load_full_section():
@@ -142,3 +150,13 @@ def get_section_neighbors(col, cols):
     """
     section = col.split('_')[1]
     return [c for c in cols if section in c]
+
+
+def get_section_members(section_name, cols):
+    """
+    给定一个 section，取出在这个 section 所有成员
+    :param section_name: section 的名字，格式为 Sxx
+    :param cols: 所有的列
+    :return: 该 section 上所有成员的列表
+    """
+    return [col for col in cols if section_name in col]
