@@ -1,3 +1,4 @@
+from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from utils.config import get_config
 

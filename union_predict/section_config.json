@@ -2,7 +2,7 @@
   "predict-target": "taseometer",
   "data-parameters": {
       "pred-len": 14,
-      "future-days": 14,
+      "future-days": 1,
       "env-factor-num": 3
   },
   "model-parameters": {
@@ -14,7 +14,11 @@
           "epoch-num": 300
       },
       "mlp": {
-          "hidden-size": [17, 9]
+          "hidden-size": [213, 106, 53],
+          "pca-components": 17
+      },
+      "lr": {
+          "pca-components": 17
       }
   },
   "predict-result": {

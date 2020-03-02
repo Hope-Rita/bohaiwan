@@ -87,6 +87,7 @@ def load_cols(filename, cols, load_func, random_pick=False):
 
     print(f'开始从{filename}载入数据')
     for col in cols:
+        print('处理列：', col)
         x, y = load_func(filename, col)
         data[col] = dataset_split(x, y, random_pick=random_pick)
 

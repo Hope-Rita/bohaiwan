@@ -18,7 +18,7 @@ from utils.config import get_config
 
 
 # 存放预测结果文件的路径
-res_dir1, res_dir2 = get_config('config.json', 'section-pred-result', inner_keys=['result1', 'result2'])
+res_dir1, res_dir2 = get_config('section_config.json', 'predict-result', inner_keys=['result1', 'result2'])
 
 
 def scheme1(filename, section):
@@ -31,7 +31,7 @@ def scheme1(filename, section):
     # 加载给定 section 上的数据集
     data = gen_dataset.load_section(filename, section)
 
-    for func in [lr.lr_predict, svr.svr_predict, xgb.xgb_predict, mlp.mlp_predict]:
+    for func in [lr.lr_pca_predict, svr.svr_predict, xgb.xgb_predict, mlp.mlp_predict]:
         predict_one_cols(func, data, filename)
 
 
