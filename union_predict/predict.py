@@ -72,7 +72,7 @@ def predict_one_cols(func, data, filename):
 
     # 写入 CSV 文件
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
-    data_process.dump_csv(res_dir2, csv_name, cols_metrics, avg=avg)
+    data_process.dump_csv(res_dir2, csv_name, cols_metrics, avg=data_process.avg)
 
 
 def predict_all_data(func, filename):
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
 
     target_data = gen_dataset.load_cols(pred_target_filename)
-    predict_one_cols(lstm.lstm_union_predict, target_data, pred_target_filename)
+    predict_one_cols(lstm.rnn_union_predict, target_data, pred_target_filename)

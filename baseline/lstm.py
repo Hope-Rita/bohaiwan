@@ -1,15 +1,15 @@
 import numpy as np
 import time
 import torch
-from baseline import normalization
+from utils import normalization
 from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
-from union_predict import gen_dataset
 from utils.config import get_config
+from utils.metric import RMSELoss
 
 
-config_path = 'config.json'
+config_path = '../union_predict/config.json'
 # 参数加载
 device = torch.device(get_config(config_path, 'device', 'cuda') if torch.cuda.is_available() else 'cpu')
 model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
@@ -23,56 +23,144 @@ model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
                              'learning-rate'
                              ]
                  )
+rnn_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'rnn-hidden-size')
+gru_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'gru-hidden-size')
 
 
-class LstmReg(nn.Module):
+class RegBase(nn.Module):
 
-    def __init__(self, input_size, hidden_size=model_hidden_size, output_size=1, num_layers=2):
-        super(LstmReg, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers)
+    def __init__(self, hidden_size, output_size=1):
+        super(RegBase, self).__init__()
         self.reg = nn.Linear(hidden_size, output_size)
+
+    def forward(self, rnn_output):
+        s, b, h = rnn_output.shape
+        rnn_output = rnn_output.view(s * b, h)
+        res = self.reg(rnn_output)
+        res = res.view(s, b, -1)
+        return res
+
+
+class RNNReg(RegBase):
+
+    def __init__(self, input_size, hidden_size=rnn_hidden_size, output_size=1):
+        super(RNNReg, self).__init__(hidden_size, output_size)
+        self.rnn = nn.RNN(input_size, hidden_size)
+
+    def forward(self, x):
+        x, _ = self.rnn(x)
+        return super().forward(x)
+
+
+class GRUReg(RegBase):
+
+    def __init__(self, input_size, hidden_size=gru_hidden_size, output_size=1):
+        super(GRUReg, self).__init__(hidden_size, output_size)
+        self.gru = nn.GRU(input_size, hidden_size)
+
+    def forward(self, x):
+        x, _ = self.gru(x)
+        return super().forward(x)
+
+
+class LSTMReg(RegBase):
+
+    def __init__(self, input_size, hidden_size=model_hidden_size, output_size=1):
+        super(LSTMReg, self).__init__(hidden_size, output_size)
+        self.lstm = nn.LSTM(input_size, hidden_size)
 
     def forward(self, x):
         x, _ = self.lstm(x)
-        s, b, h = x.shape
-        x = x.view(s * b, h)
-        x = self.reg(x)
-        x = x.view(s, b, -1)
-        return x
+        return super().forward(x)
 
 
-class FusionLstm(nn.Module):
+class FusionBase(nn.Module):
 
-    def __init__(self, time_series_len, hidden_size=model_hidden_size, output_size=1, num_layers=2):
-        super(FusionLstm, self).__init__()
-        self.lstm = nn.LSTM(time_series_len, hidden_size, num_layers)
-        self.fc_fusion = nn.Linear(hidden_size + gen_dataset.env_factor_num, output_size)
+    def __init__(self, time_series_len, hidden_size, output_size=1):
+        super(FusionBase, self).__init__()
+        env_factor_num = get_config('../union_predict/config.json', 'data-parameters', 'env-factor-num')
+        self.fc_fusion = nn.Linear(hidden_size + env_factor_num, output_size)
         self.time_series_len = time_series_len
 
-    def forward(self, input_x):
+    def forward(self, rnn_output, env_factor_vec):
+        s, b, h = rnn_output.shape
+        rnn_output = rnn_output.view(s * b, h)
+        env_factor_vec = env_factor_vec.view(env_factor_vec.shape[0] * env_factor_vec.shape[1], -1)
+
+        x = torch.cat((rnn_output, env_factor_vec), dim=1)
+        res = self.fc_fusion(x)
+        res = res.view(s, b, -1)
+        return res
+
+
+class RNNFusion(FusionBase):
+
+    def __init__(self, time_series_len, hidden_size=rnn_hidden_size, output_size=1):
+        super(RNNFusion, self).__init__(time_series_len, hidden_size, output_size)
+        self.rnn = nn.RNN(time_series_len, hidden_size)
+
+    def forward(self, input_x, _=None):
+        x = input_x[:, :, :self.time_series_len]
+        e = input_x[:, :, self.time_series_len:]
+        x, _ = self.rnn(x)
+
+        return super().forward(x, e)
+
+
+class GRUFusion(FusionBase):
+
+    def __init__(self, time_series_len, hidden_size=gru_hidden_size, output_size=1):
+        super(GRUFusion, self).__init__(time_series_len, hidden_size, output_size)
+        self.gru = nn.GRU(time_series_len, hidden_size)
+
+    def forward(self, input_x, _=None):
+        x = input_x[:, :, :self.time_series_len]
+        e = input_x[:, :, self.time_series_len:]
+        x, _ = self.gru(x)
+
+        return super(GRUFusion, self).forward(x, e)
+
+
+class LSTMFusion(FusionBase):
+
+    def __init__(self, time_series_len, hidden_size=model_hidden_size, output_size=1):
+        super(LSTMFusion, self).__init__(time_series_len, hidden_size, output_size)
+        self.lstm = nn.LSTM(time_series_len, hidden_size)
+
+    def forward(self, input_x, _=None):
         x = input_x[:, :, :self.time_series_len]
         e = input_x[:, :, self.time_series_len:]
         x, _ = self.lstm(x)
 
-        s, b, h = x.shape
-        x = x.view(s * b, h)
-        e = e.view(e.shape[0] * e.shape[1], -1)
-
-        x = torch.cat((x, e), dim=1)
-        x = self.fc_fusion(x)
-        x = x.view(s, b, -1)
-        return x
+        return super().forward(x, e)
 
 
-def lstm_union_predict(x_train, y_train, x_test):
+def union_predict(model, x_train, y_train, x_test):
     data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
-    model = FusionLstm(time_series_len=gen_dataset.pred_len).to(device)
-    model = train_model(model, data_loader)
 
+    model = train_model(model, data_loader)
     pred = model(x_test)
     pred = pred.data.to('cpu').numpy()
     pred = pred.reshape(-1)
     return pred
+
+
+def lstm_union_predict(x_train, y_train, x_test):
+    pred_len = get_config(config_path, 'data-parameters', 'pred-len')
+    model = LSTMFusion(time_series_len=pred_len).to(device)
+    return union_predict(model, x_train, y_train, x_test)
+
+
+def gru_union_predict(x_train, y_train, x_test):
+    pred_len = get_config(config_path, 'data-parameters', 'pred-len')
+    model = GRUFusion(time_series_len=pred_len).to(device)
+    return union_predict(model, x_train, y_train, x_test)
+
+
+def rnn_union_predict(x_train, y_train, x_test):
+    pred_len = get_config(config_path, 'data-parameters', 'pred-len')
+    model = RNNFusion(time_series_len=pred_len).to(device)
+    return union_predict(model, x_train, y_train, x_test)
 
 
 def lstm_predict(x_train, y_train, x_test):
@@ -81,7 +169,7 @@ def lstm_predict(x_train, y_train, x_test):
     data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test)
 
     # 训练模型
-    model = LstmReg(x_train.shape[-1]).to(device)
+    model = LSTMReg(x_train.shape[-1]).to(device)
     model = train_model(model, data_loader)
 
     pred = model(x_test)
@@ -91,7 +179,7 @@ def lstm_predict(x_train, y_train, x_test):
 
 
 def train_model(model, data_loader):
-    mse = nn.MSELoss()
+    rmse = RMSELoss()
     opt = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=2, threshold=1e-3, min_lr=1e-6)
     min_loss = np.inf
@@ -109,7 +197,7 @@ def train_model(model, data_loader):
 
             with torch.set_grad_enabled(True):
                 pred_y = model(x)
-                loss = mse(pred_y, y)
+                loss = rmse(pred_y, y)
                 train_loss += loss.item()
 
                 opt.zero_grad()

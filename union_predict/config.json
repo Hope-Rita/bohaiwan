@@ -7,10 +7,12 @@
   },
   "model-parameters": {
       "lstm": {
-          "model-hidden-size": 40,
+          "model-hidden-size": 5,
+          "rnn-hidden-size": 5,
+          "gru-hidden-size": 5,
           "num-workers": 0,
           "batch-size": 16,
-          "learning-rate": 0.3,
+          "learning-rate": 0.1,
           "epoch-num": 300
       },
       "mlp": {
@@ -22,7 +24,7 @@
       "result2": "/home/lwt/bohaiwan/union_predict/result2"
   },
   "device": {
-      "cuda": "cuda:1",
+      "cuda": "cuda:0",
       "cpu": "cpu"
   }
 }

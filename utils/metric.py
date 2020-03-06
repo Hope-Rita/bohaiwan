@@ -1,6 +1,18 @@
 import numpy as np
+import torch
 from scipy.stats import pearsonr
 from sklearn import metrics
+from torch import nn
+
+
+class RMSELoss(nn.Module):
+
+    def __init__(self):
+        super(RMSELoss, self).__init__()
+        self.mse = nn.MSELoss()
+
+    def forward(self, y_hat, y):
+        return torch.sqrt(self.mse(y_hat, y))
 
 
 def mae(y, pred):

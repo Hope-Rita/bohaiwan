@@ -1,8 +1,8 @@
 import json
 import numpy as np
 import pandas as pd
+from utils import normalization
 import utils.load_utils as ld
-from baseline import normalization
 from utils.config import get_config
 
 

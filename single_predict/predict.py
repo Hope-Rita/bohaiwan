@@ -89,5 +89,5 @@ def predict_plot(filename):
 
 if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
-    pred_target_filename = get_config('../data/data.json', pred_target, 'local')
+    pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     supervised_model(pred_target_filename, lstm.lstm_predict)
