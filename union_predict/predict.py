@@ -87,5 +87,6 @@ if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
 
-    target_data = gen_dataset.load_cols(pred_target_filename)
-    predict_one_cols(lstm.rnn_union_predict, target_data, pred_target_filename)
+    # target_data = gen_dataset.load_cols(pred_target_filename)
+    # predict_one_cols(lstm.rnn_union_predict, target_data, pred_target_filename)
+    scheme2(pred_target_filename)

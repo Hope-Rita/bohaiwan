@@ -27,6 +27,10 @@ def rmse(y, pred):
     return np.sqrt(mse(y, pred))
 
 
+def mape(y, pred):
+    return np.mean(np.abs((pred - y) / y)) * 100
+
+
 def pcc(y, pred):
     return pearsonr(y, pred)[0]
 
@@ -35,5 +39,6 @@ def all_metric(y, pred):
     return {
         'RMSE': rmse(y, pred),
         'MAE': mae(y, pred),
+        'MAPE': mape(y, pred),
         'PCC': pcc(y, pred)
     }

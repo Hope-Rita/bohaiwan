@@ -35,6 +35,7 @@ def dump_csv(dirname, filename, data, avg=None):
         # 统计总体的平均 RMSE, MAE 和 PCC
         print('RMSE', avg(df.loc[:, 'RMSE']))
         print('MAE', avg(df.loc[:, 'MAE']))
+        print('MAPE', avg(df.loc[:, 'MAPE']))
         print('PCC', avg(df.loc[:, 'PCC']))
 
     print()

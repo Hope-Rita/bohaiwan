@@ -12,7 +12,7 @@
           "gru-hidden-size": 5,
           "num-workers": 0,
           "batch-size": 16,
-          "learning-rate": 0.1,
+          "learning-rate": 0.3,
           "epoch-num": 300
       },
       "mlp": {
