@@ -15,7 +15,7 @@ pred_len, future_days, env_factor_num = get_config('config.json',
 
 def gen_data(filename, col_id, add_date=False):
     """
-    生成数据集
+    生成一个列的数据集
     :param filename: 数据来源的文件
     :param col_id: 列号
     :param add_date: 是否返回预测那天的日期
@@ -88,10 +88,21 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)
 
+    # 对样本集进行归一化，结果集不需要归一化
     if add_date:
-        return np.array(x), np.array(y), np.array(predict_dates)
+        return data_process.col_normalization(np.array(x)), np.array(y), np.array(predict_dates)
     else:
-        return np.array(x), np.array(y)
+        return data_process.col_normalization(np.array(x)), np.array(y)
+
+
+def load_one_col(filname, col):
+    """
+    载入给定列的数据
+    :param filname: 存放数据的 CSV 文件
+    :param col: 指定的列号
+    :return: 四个数据集
+    """
+    return ld.load_one_col(filname, col, load_func=gen_data)
 
 
 def load_cols(filename):

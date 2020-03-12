@@ -83,10 +83,24 @@ def predict_all_data(func, filename):
     print(metric.all_metric(y_test, pred))
 
 
+def predict_one_col(filename, col, func):
+    """
+    使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检查测试
+    :param filename: 存放数据的 CSV 文件
+    :param col: 预测的列号
+    :param func: 预测用的模型
+    """
+    x_train, y_train, x_test, y_test = gen_dataset.load_one_col(filename, col)
+    pred = func(x_train, y_train, x_test)
+    print(metric.all_metric(y_test, pred))
+
+
 if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
+    pred_col = get_config('config.json', 'predict-col')
 
+    predict_one_col(pred_target_filename, pred_col, lr.lr_predict)
     # target_data = gen_dataset.load_cols(pred_target_filename)
-    # predict_one_cols(lstm.rnn_union_predict, target_data, pred_target_filename)
-    scheme2(pred_target_filename)
+    # predict_one_cols(lstm.lstm_union_predict, target_data, pred_target_filename)
+    # scheme2(pred_target_filename)

@@ -18,8 +18,6 @@ class MinMaxNormal(object):
             self._min = x.min()
             self._max = x.max()
 
-        print("min:", self._min, "max:", self._max)
-
     def transform(self, x):
         x = 1. * (x - self._min) / (self._max - self._min)
         x = x * 2. - 1.

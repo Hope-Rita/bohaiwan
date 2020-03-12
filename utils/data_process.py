@@ -1,4 +1,5 @@
 import pandas as pd
+from utils import normalization
 
 
 def split_date(frame):
@@ -49,3 +50,16 @@ def avg(series):
     """
     series = series.dropna()
     return sum(series) / len(series)
+
+
+def col_normalization(data):
+    """
+    对样本集的每一列进行归一化
+    :param data: 类型为 numpy 数组
+    :return: 归一化后的样本集
+    """
+    for i in range(data.shape[1]):
+        normal_x = normalization.MinMaxNormal(data[:, i])
+        data[:, i] = normal_x.transform(data[:, i])
+
+    return data
