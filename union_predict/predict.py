@@ -5,6 +5,8 @@
 """
 
 
+import numpy as np
+import platform
 import utils.pred_utils as pu
 from baseline import lr
 from baseline import lstm
@@ -13,12 +15,14 @@ from baseline import svr
 from baseline import xgb
 from union_predict import gen_dataset
 from utils import data_process
+from utils import draw_pic
 from utils import metric
 from utils.config import get_config
 
 
 # 存放预测结果文件的路径
-res_dir1, res_dir2 = get_config('config.json', 'predict-result', inner_keys=['result1', 'result2'])
+res_dir1 = get_config('config.json', 'predict-result', 'result1', 'local')
+res_dir2 = get_config('config.json', 'predict-result', 'result2', 'local')
 
 
 def predict_every_col(filename):
@@ -71,7 +75,10 @@ def predict_one_cols(func, data, filename):
     cols_metrics = pu.predict_one_cols(func, data)
 
     # 写入 CSV 文件
-    csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
+    csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
+    # 系统不同，处理方式不一样
+    csv_name += filename.split('\\')[-1] if platform.system() is 'Windows' else filename.split('/')[-1]
+
     data_process.dump_csv(res_dir2, csv_name, cols_metrics, avg=data_process.avg)
 
 
@@ -93,14 +100,15 @@ def predict_one_col(filename, col, func):
     x_train, y_train, x_test, y_test = gen_dataset.load_one_col(filename, col)
     pred = func(x_train, y_train, x_test)
     print(metric.all_metric(y_test, pred))
+    draw_pic.compare(np.concatenate((y_train, y_test)), np.concatenate((y_train, pred)), col)
 
 
 if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
-    pred_target_filename = get_config('../data/data.json', pred_target, 'server')
+    pred_target_filename = get_config('../data/data.json', pred_target, 'local')
     pred_col = get_config('config.json', 'predict-col')
 
-    predict_one_col(pred_target_filename, pred_col, lr.lr_predict)
+    # predict_one_col(pred_target_filename, pred_col, lr.lr_predict)
     # target_data = gen_dataset.load_cols(pred_target_filename)
     # predict_one_cols(lstm.lstm_union_predict, target_data, pred_target_filename)
-    # scheme2(pred_target_filename)
+    scheme2(pred_target_filename)

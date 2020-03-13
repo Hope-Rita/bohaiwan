@@ -5,8 +5,8 @@ from utils.config import get_config
 from utils import data_process
 
 
-weather = get_config('../data/data.json', 'weather', 'server')
-waterline = get_config('../data/data.json', 'waterline', 'server')
+weather = get_config('../data/data.json', 'weather', 'local')
+waterline = get_config('../data/data.json', 'waterline', 'local')
 pred_len, future_days, env_factor_num = get_config('config.json',
                                                    'data-parameters',
                                                    inner_keys=['pred-len', 'future-days', 'env-factor-num']

@@ -28,7 +28,18 @@ def rmse(y, pred):
 
 
 def mape(y, pred):
-    return np.mean(np.abs((pred - y) / y)) * 100
+    # 过小的数据不计算进去
+    err = 0.0
+    remove_num = 0
+
+    for i in range(len(y)):
+
+        if abs(y[i]) < 0.01:
+            remove_num += 1
+        else:
+            err += abs((y[i] - pred[i]) / y[i])
+
+    return 100 * err / (len(y) - remove_num)
 
 
 def pcc(y, pred):

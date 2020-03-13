@@ -1,31 +1,37 @@
 {
   "predict-target": "taseometer",
-  "predict-col": "FSS_S01_B7_015",
+  "predict-col": "FSS_S06_B7_015",
   "data-parameters": {
-      "pred-len": 14,
-      "future-days": 14,
-      "env-factor-num": 3
+    "pred-len": 14,
+    "future-days": 14,
+    "env-factor-num": 3
   },
   "model-parameters": {
-      "lstm": {
-          "model-hidden-size": 15,
-          "rnn-hidden-size": 15,
-          "gru-hidden-size": 15,
-          "num-workers": 0,
-          "batch-size": 16,
-          "learning-rate": 1,
-          "epoch-num": 300
+    "lstm": {
+      "model-hidden-size": 15,
+      "rnn-hidden-size": 15,
+      "gru-hidden-size": 15,
+      "num-workers": 0,
+      "batch-size": 16,
+      "learning-rate": 1,
+      "epoch-num": 300
       },
-      "mlp": {
-          "hidden-size": [8, 4]
-      }
+    "mlp": {
+      "hidden-size": [8, 4]
+    }
   },
   "predict-result": {
-      "result1": "/home/lwt/bohaiwan/union_predict/result1",
-      "result2": "/home/lwt/bohaiwan/union_predict/result2"
+    "result1": {
+      "server": "/home/lwt/bohaiwan/union_predict/result1",
+      "local": "C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result1"
+    },
+    "result2":{
+      "server": "/home/lwt/bohaiwan/union_predict/result2",
+      "local": "C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result2"
+    }
   },
   "device": {
-      "cuda": "cuda:2",
-      "cpu": "cpu"
+    "cuda": "cuda:2",
+    "cpu": "cpu"
   }
 }

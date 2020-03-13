@@ -1,3 +1,5 @@
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -33,8 +35,11 @@ def metric_for_cols():
 
     plt.legend()
     plt.show()
-    print('ssss')
 
 
-if __name__ == '__main__':
-    metric_for_cols()
+def compare(y, pred, col_name):
+    plt.plot(pred, color='green', label='predict')
+    plt.plot(y, label='truth')
+    plt.legend()
+    #plt.show()
+    plt.savefig(f'../pics/{col_name}.jpg')

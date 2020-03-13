@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from utils import normalization
 
@@ -28,7 +29,8 @@ def dump_csv(dirname, filename, data, avg=None):
     :param avg: 求均值的方法
     """
     df = pd.DataFrame(data)
-    filename = dirname + '/' + filename
+    # filename = dirname + '/' + filename
+    filename = os.path.join(dirname, filename)
     df.to_csv(filename, index=False)
     print('完成预测，已写入', filename)
 
