@@ -1,5 +1,5 @@
-import matplotlib as mpl
-mpl.use('Agg')
+# import matplotlib as mpl
+# mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -38,6 +38,7 @@ def metric_for_cols():
 
 
 def compare(y, pred, col_name):
+    plt.figure(figsize=(15, 8))
     plt.plot(pred, color='green', label='predict')
     plt.plot(y, label='truth')
     plt.legend()

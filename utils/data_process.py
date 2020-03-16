@@ -29,7 +29,6 @@ def dump_csv(dirname, filename, data, avg=None):
     :param avg: 求均值的方法
     """
     df = pd.DataFrame(data)
-    # filename = dirname + '/' + filename
     filename = os.path.join(dirname, filename)
     df.to_csv(filename, index=False)
     print('完成预测，已写入', filename)
@@ -42,6 +41,20 @@ def dump_csv(dirname, filename, data, avg=None):
         print('PCC', avg(df.loc[:, 'PCC']))
 
     print()
+
+
+def dump_pred_result(dirname, filename, y, pred, date):
+    """
+    把预测得到的数据和真实数据写入到 CSV 文件中
+    :param dirname: 存放文件的目录
+    :param filename: 存放数据的文件名
+    :param y: 真实值
+    :param pred: 预测值
+    :param date: 日期，这里是所有的日期，要截断
+    """
+    df = pd.DataFrame({'truth': y, 'predict': pred}, index=date[-len(y):])
+    # df = pd.DataFrame({'truth': y, 'predict': pred, 'date': date[-len(y):]})
+    df.to_csv(os.path.join(dirname, filename), index_label='date')
 
 
 def avg(series):

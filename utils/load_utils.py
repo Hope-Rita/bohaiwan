@@ -95,24 +95,30 @@ def load_cols(filename, cols, load_func, random_pick=False):
     return data
 
 
-def load_one_col(filename, col, load_func, random_pick=False):
+def load_one_col(filename, col, load_func, random_pick=False, add_date=False):
     """
     加载指定的列，并划分训练集和测试集
     :param filename: 存放数据的 csv 文件
     :param col: 要加载的列
     :param load_func: 加载数据使用的函数
     :param random_pick: 是否随机选取
+    :param add_date: 是否返回日期序列
     :return: 四个数据集
     """
     if not callable(load_func):
         raise ValueError('未提供载入数据的方法')
 
     print(f'开始从{filename}载入数据')
-    x, y = load_func(filename, col)
-    data = dataset_split(x, y, random_pick=random_pick)
+    # 加载数据集
+    load_data = load_func(filename, col, add_date)
+    # 划分训练集和测试集
+    data = dataset_split(load_data[0], load_data[1], random_pick=random_pick)
 
     print('已生成数据集\n')
-    return data
+    if add_date:
+        return data + (load_data[2], )  # 把数据集和日期放在一块返回
+    else:
+        return data
 
 
 def dataset_split(x, y, rate=0.7, random_pick=False, return_numpy=True):

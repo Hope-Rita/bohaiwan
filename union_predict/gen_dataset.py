@@ -95,24 +95,27 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
         return data_process.col_normalization(np.array(x)), np.array(y)
 
 
-def load_one_col(filname, col):
+def load_one_col(filname, col, add_date=False, random_pick=False):
     """
     载入给定列的数据
     :param filname: 存放数据的 CSV 文件
     :param col: 指定的列号
+    :param add_date: 是否增加日期序列
+    :param random_pick: 在划分数据集的时候是否随机选取
     :return: 四个数据集
     """
-    return ld.load_one_col(filname, col, load_func=gen_data)
+    return ld.load_one_col(filname, col, load_func=gen_data, add_date=add_date)
 
 
-def load_cols(filename):
+def load_cols(filename, random_pick=False):
     """
     分别导入各列数据，并进行划分
     :param filename: 存放数据的 csv 文件路径
+    :param random_pick: 是否随机选取数据集
     :return: dict(numpy.ndarray) key 是列名
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_cols(filename, cols=frame.columns[1:], load_func=gen_data)
+    return ld.load_cols(filename, cols=frame.columns[1:], load_func=gen_data, random_pick=random_pick)
 
 
 def load_every_col(filename):

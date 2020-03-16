@@ -74,9 +74,8 @@ def predict_one_cols(func, data, filename):
     # 进行训练，得到每一列数据的预测指标
     cols_metrics = pu.predict_one_cols(func, data)
 
-    # 写入 CSV 文件
+    # 写入 CSV 文件。系统不同，处理方式不一样
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
-    # 系统不同，处理方式不一样
     csv_name += filename.split('\\')[-1] if platform.system() is 'Windows' else filename.split('/')[-1]
 
     data_process.dump_csv(res_dir2, csv_name, cols_metrics, avg=data_process.avg)
@@ -97,9 +96,10 @@ def predict_one_col(filename, col, func):
     :param col: 预测的列号
     :param func: 预测用的模型
     """
-    x_train, y_train, x_test, y_test = gen_dataset.load_one_col(filename, col)
+    x_train, y_train, x_test, y_test, dates = gen_dataset.load_one_col(filename, col, add_date=True)
     pred = func(x_train, y_train, x_test)
     print(metric.all_metric(y_test, pred))
+    data_process.dump_pred_result('onecol_pred_result', f'{func.__name__}_{col}.csv', y_test, pred, dates)
     draw_pic.compare(np.concatenate((y_train, y_test)), np.concatenate((y_train, pred)), col)
 
 
@@ -109,6 +109,6 @@ if __name__ == '__main__':
     pred_col = get_config('config.json', 'predict-col')
 
     # predict_one_col(pred_target_filename, pred_col, lr.lr_predict)
-    # target_data = gen_dataset.load_cols(pred_target_filename)
-    # predict_one_cols(lstm.lstm_union_predict, target_data, pred_target_filename)
-    scheme2(pred_target_filename)
+    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    predict_one_cols(lr.lr_predict, target_data, pred_target_filename)
+    # scheme2(pred_target_filename)
