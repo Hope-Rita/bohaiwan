@@ -52,12 +52,12 @@ def load_every_col(filename, cols, load_func, random_pick=False):
         print('处理列：', col)
         x, y = load_func(filename, col)
 
-        splited_data = dataset_split(x, y, random_pick=random_pick, return_numpy=False)
+        split_data = dataset_split(x, y, random_pick=random_pick, return_numpy=False)
         # 放入总体的训练集
-        x_train.extend(splited_data[0])
-        y_train.extend(splited_data[1])
+        x_train.extend(split_data[0])
+        y_train.extend(split_data[1])
         # 放入各列的测试集
-        test_data[col] = (np.array(splited_data[2]), np.array(splited_data[3]))
+        test_data[col] = (np.array(split_data[2]), np.array(split_data[3]))
 
     x_train = np.array(x_train)
     y_train = np.array(y_train)

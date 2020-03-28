@@ -37,10 +37,13 @@ def metric_for_cols():
     plt.show()
 
 
-def compare(y, pred, col_name):
+def compare(y, pred, col_name, title_info=None):
     plt.figure(figsize=(15, 8))
     plt.plot(pred, color='green', label='predict')
     plt.plot(y, label='truth')
+
+    if title_info:
+        plt.title(title_info)
+
     plt.legend()
-    #plt.show()
     plt.savefig(f'../pics/{col_name}.jpg')

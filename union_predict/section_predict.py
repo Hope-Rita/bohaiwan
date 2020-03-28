@@ -8,8 +8,8 @@
 
 import utils.pred_utils as pu
 from baseline import lr
-from baseline import lstm
 from baseline import mlp
+from baseline import recurrent
 from baseline import svr
 from baseline import xgb
 from union_predict import gen_dataset
@@ -55,4 +55,7 @@ def predict_one_cols(func, data, filename):
 if __name__ == '__main__':
     pred_target = get_config('section_config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
-    scheme1(pred_target_filename, 'S01')
+    # scheme1(pred_target_filename, 'S01')
+
+    pred_data = gen_dataset.load_section(pred_target_filename, 'S01')
+    predict_one_cols(recurrent.lstm_section_predict, pred_data, pred_target_filename)

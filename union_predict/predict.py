@@ -9,8 +9,8 @@ import numpy as np
 import platform
 import utils.pred_utils as pu
 from baseline import lr
-from baseline import lstm
 from baseline import mlp
+from baseline import recurrent
 from baseline import svr
 from baseline import xgb
 from union_predict import gen_dataset
@@ -21,8 +21,8 @@ from utils.config import get_config
 
 
 # 存放预测结果文件的路径
-res_dir1 = get_config('config.json', 'predict-result', 'result1', 'local')
-res_dir2 = get_config('config.json', 'predict-result', 'result2', 'local')
+res_dir1 = get_config('config.json', 'predict-result', 'result1', 'server')
+res_dir2 = get_config('config.json', 'predict-result', 'result2', 'server')
 
 
 def predict_every_col(filename):
@@ -89,26 +89,34 @@ def predict_all_data(func, filename):
     print(metric.all_metric(y_test, pred))
 
 
-def predict_one_col(filename, col, func):
+def predict_one_col(filename, col, func, is_draw_pic=True):
     """
     使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检查测试
     :param filename: 存放数据的 CSV 文件
     :param col: 预测的列号
     :param func: 预测用的模型
+    :param is_draw_pic: 是否绘制图像
     """
     x_train, y_train, x_test, y_test, dates = gen_dataset.load_one_col(filename, col, add_date=True)
     pred = func(x_train, y_train, x_test)
     print(metric.all_metric(y_test, pred))
     data_process.dump_pred_result('onecol_pred_result', f'{func.__name__}_{col}.csv', y_test, pred, dates)
-    draw_pic.compare(np.concatenate((y_train, y_test)), np.concatenate((y_train, pred)), col)
+
+    # 画个比较图
+    if is_draw_pic:
+        draw_pic.compare(y=np.concatenate((y_train, y_test)),
+                         pred=np.concatenate((y_train, pred)),
+                         col_name=col,
+                         title_info=(func.__name__ + ' ' + col)
+                         )
 
 
 if __name__ == '__main__':
     pred_target = get_config('config.json', 'predict-target')
-    pred_target_filename = get_config('../data/data.json', pred_target, 'local')
+    pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     pred_col = get_config('config.json', 'predict-col')
 
-    # predict_one_col(pred_target_filename, pred_col, lr.lr_predict)
-    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    predict_one_cols(lr.lr_predict, target_data, pred_target_filename)
+    predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
+    # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    # predict_one_cols(xgb.xgb_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)

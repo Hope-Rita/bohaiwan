@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import utils.pred_utils as pu
 from baseline import lr
-from baseline import lstm
+from baseline import recurrent
 from baseline import mlp
 from baseline import svr
 from baseline import xgb
@@ -11,14 +11,16 @@ from utils import config
 from utils import data_process
 
 
-config_path = 'config.json'
+config_path = 'pred_len_survey.json'
 
 
-def produce_result():
+def produce_result(func):
     # 跑完多次试验，收集结果
     res = []
     for pred_len in range(3, 22):
-        res.append(k_day_predict(lr.lr_predict, pred_len))
+        # mlp.hidden_size = (pred_len + 1) // 2
+        mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
+        res.append(k_day_predict(func, pred_len))
 
     result_frame = merge_result(res)
 
@@ -43,7 +45,7 @@ def k_day_predict(pred_func, k):
     print('当前的 pred-len 为', k)
     # 载入数据
     pred_target = config.get_config('config.json', 'predict-target')
-    pred_target_filename = config.get_config('../data/data.json', pred_target, 'local')
+    pred_target_filename = config.get_config('../data/data.json', pred_target, 'server')
     data = gen_dataset.load_cols(pred_target_filename)
 
     # 测试模型, 返回结果
@@ -85,10 +87,10 @@ def merge_result(frame_list):
     :param frame_list: 存放 DataFrame 的列表
     :return: 合并后的列表，index 为列号
     """
-    df = frame_list[0]
+    frame = frame_list[0]
     for i in range(1, len(frame_list)):
-        df = pd.merge(df, frame_list[i], left_index=True, right_index=True)
-    return df
+        frame = pd.merge(frame, frame_list[i], left_index=True, right_index=True)
+    return frame
 
 
 def assemble_frame(metric_list, k_day):
@@ -115,7 +117,7 @@ def assemble_frame(metric_list, k_day):
 
 if __name__ == '__main__':
 
-    produce_result()
+    produce_result(mlp.mlp_predict)
 
     # 绘图
     df = pd.read_csv('pred_len_survey.csv', index_col='Column')

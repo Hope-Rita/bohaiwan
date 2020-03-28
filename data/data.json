@@ -3,6 +3,10 @@
       "local": "C:\\study\\WorkSpace\\bohaiwan\\data\\taseometer.csv",
       "server": "/home/lwt/bohaiwan/data/taseometer.csv"
   },
+  "taseometer-full": {
+      "local": "C:\\study\\WorkSpace\\bohaiwan\\data\\taseometer-full.csv",
+      "server": "/home/lwt/bohaiwan/data/taseometer-full.csv"
+  },
   "strainmeter": {
       "local": "C:\\study\\WorkSpace\\bohaiwan\\data\\strainmeter.csv",
       "server": "/home/lwt/bohaiwan/data/strainmeter.csv"

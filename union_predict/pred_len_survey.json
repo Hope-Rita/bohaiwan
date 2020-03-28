@@ -1,6 +1,5 @@
 {
     "predict-target":"taseometer",
-    "predict-col":"FSS_S01_B1_004",
     "data-parameters":{
         "pred-len":5,
         "future-days":14,
@@ -13,21 +12,14 @@
             "gru-hidden-size":15,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.001,
+            "learning-rate":1,
             "epoch-num":300
         },
         "mlp":{
-            "hidden-size": [38, 19, 9]
-        }
-    },
-    "predict-result":{
-        "result1":{
-            "server":"/home/lwt/bohaiwan/union_predict/result1",
-            "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result1"
-        },
-        "result2":{
-            "server":"/home/lwt/bohaiwan/union_predict/result2",
-            "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result2"
+            "hidden-size":[
+                8,
+                4
+            ]
         }
     },
     "device":{

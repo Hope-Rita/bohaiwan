@@ -5,9 +5,9 @@ from utils.config import get_config
 from utils import data_process
 
 
-weather = get_config('../data/data.json', 'weather', 'local')
-waterline = get_config('../data/data.json', 'waterline', 'local')
-pred_len, future_days, env_factor_num = get_config('config.json',
+weather = get_config('../data/data.json', 'weather', 'server')
+waterline = get_config('../data/data.json', 'waterline', 'server')
+pred_len, future_days, env_factor_num = get_config('section_config.json',
                                                    'data-parameters',
                                                    inner_keys=['pred-len', 'future-days', 'env-factor-num']
                                                    )
@@ -34,7 +34,7 @@ def gen_section_data(filename, col_id, add_date=False):
              x in shape(m, pred_len * col_num + env_factor_len), y in shape(m,)
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    neighbors = get_section_neighbors(col_id, frame.columns[1:])  # 与 col_id 同 section 的邻居
+    neighbors = get_section_neighbors(col_id, frame.columns)  # 与 col_id 同 section 的邻居
     return produce_dataset(filename, col_id, section_neighbors=neighbors, add_date=add_date)
 
 
@@ -115,7 +115,7 @@ def load_cols(filename, random_pick=False):
     :return: dict(numpy.ndarray) key 是列名
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_cols(filename, cols=frame.columns[1:], load_func=gen_data, random_pick=random_pick)
+    return ld.load_cols(filename, cols=frame.columns, load_func=gen_data, random_pick=random_pick)
 
 
 def load_every_col(filename):
@@ -125,7 +125,7 @@ def load_every_col(filename):
     :return: x_train, y_train 是 numpy 数组, test_data 是 dict((x_test, y_test))
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_every_col(filename, cols=frame.columns[1:], load_func=gen_data, random_pick=True)
+    return ld.load_every_col(filename, cols=frame.columns, load_func=gen_data, random_pick=True)
 
 
 def load_all(filename):
@@ -135,7 +135,7 @@ def load_all(filename):
     :return: 四个 numpy 数组
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_all(filename, cols=frame.columns[1:], load_func=gen_data)
+    return ld.load_all(filename, cols=frame.columns, load_func=gen_data)
 
 
 def load_section(filename, section):
@@ -147,7 +147,7 @@ def load_section(filename, section):
     :return: dict(key=col_name, value=section_data)
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    section_members = get_section_members(section, frame.columns[1:])
+    section_members = get_section_members(section, frame.columns)
     return ld.load_cols(filename, cols=section_members, load_func=gen_section_data)
 
 
