@@ -116,7 +116,7 @@ if __name__ == '__main__':
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     pred_col = get_config('config.json', 'predict-col')
 
-    predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
-    # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    # predict_one_cols(xgb.xgb_predict, target_data, pred_target_filename)
+    # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
+    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    predict_one_cols(recurrent.lstm_union_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)

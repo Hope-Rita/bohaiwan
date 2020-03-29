@@ -7,10 +7,11 @@ from utils import data_process
 
 weather = get_config('../data/data.json', 'weather', 'server')
 waterline = get_config('../data/data.json', 'waterline', 'server')
-pred_len, future_days, env_factor_num = get_config('section_config.json',
+pred_len, future_days, env_factor_num = get_config('pred_len_survey.json',
                                                    'data-parameters',
                                                    inner_keys=['pred-len', 'future-days', 'env-factor-num']
                                                    )
+print(f'载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
 def gen_data(filename, col_id, add_date=False):

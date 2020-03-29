@@ -9,17 +9,19 @@ from baseline import xgb
 from union_predict import predict
 from utils import config
 from utils import data_process
+from union_predict import gen_dataset
+from importlib import reload
 
 
 config_path = 'pred_len_survey.json'
 
 
 def produce_result(func):
-    # 跑完多次试验，收集结果
+    # 跑多次试验，收集结果
     res = []
-    for pred_len in range(3, 22):
+    for pred_len in range(5, 17):
         # mlp.hidden_size = (pred_len + 1) // 2
-        mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
+        # mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
         res.append(k_day_predict(func, pred_len))
 
     result_frame = merge_result(res)
@@ -39,12 +41,12 @@ def k_day_predict(pred_func, k):
     config.modify_config(config_path, 'data-parameters', 'pred-len', new_val=k)
 
     # 重新 import 更新 pred-len 参数
-    from union_predict import gen_dataset
-    gen_dataset.pred_len = k
+    reload(gen_dataset)
+    reload(recurrent)
 
-    print('当前的 pred-len 为', k)
+    print('当前的 pred-len 为', gen_dataset.pred_len)
     # 载入数据
-    pred_target = config.get_config('config.json', 'predict-target')
+    pred_target = config.get_config('pred_len_survey.json', 'predict-target')
     pred_target_filename = config.get_config('../data/data.json', pred_target, 'server')
     data = gen_dataset.load_cols(pred_target_filename)
 
@@ -117,7 +119,7 @@ def assemble_frame(metric_list, k_day):
 
 if __name__ == '__main__':
 
-    produce_result(mlp.mlp_predict)
+    produce_result(recurrent.lstm_union_predict)
 
     # 绘图
     df = pd.read_csv('pred_len_survey.csv', index_col='Column')

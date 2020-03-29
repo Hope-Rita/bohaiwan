@@ -7,10 +7,9 @@ from torch.utils.data import DataLoader, TensorDataset
 from utils import normalization
 from utils.config import get_config
 from utils.metric import RMSELoss
-from union_predict.gen_dataset import pred_len, env_factor_num
 
 
-config_path = '../union_predict/config.json'
+config_path = '../union_predict/pred_len_survey.json'
 # 参数加载
 device = torch.device(get_config(config_path, 'device', 'cuda') if torch.cuda.is_available() else 'cpu')
 model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
@@ -26,6 +25,7 @@ model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
                  )
 rnn_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'rnn-hidden-size')
 gru_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'gru-hidden-size')
+pred_len, env_factor_num = get_config(config_path, 'data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 
 
 class RegBase(nn.Module):
