@@ -182,12 +182,13 @@ class LSTMSectionFusion(SectionFusion):
 
 
 def union_predict(model, x_train, y_train, x_test):
-    data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
+    data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test, normalize=True)
 
     model = train_model(model, data_loader)
     pred = model(x_test)
     pred = pred.data.to('cpu').numpy()
     pred = pred.reshape(-1)
+    pred = normal.inverse_transform(pred)
     return pred
 
 
@@ -246,19 +247,19 @@ def train_model(model, data_loader):
             with torch.set_grad_enabled(True):
                 pred_y = model(x)
                 loss = rmse(pred_y, y)
-                train_loss += loss.item()
+                train_loss += loss.item() * len(x)
 
                 opt.zero_grad()
                 loss.backward()
                 opt.step()
 
-            scheduler.step(loss)
-
-        train_loss /= data_loader.batch_size
+        train_loss /= len(data_loader.dataset)
         if train_loss < min_loss:
             min_loss = train_loss
             min_epoch = epoch
         print(f'min_loss:{min_loss}, min_epoch:{min_epoch}')
+
+        scheduler.step(loss)  # 更新学习率
 
     return model
 
@@ -273,7 +274,6 @@ def get_dataloader(x_train, y_train, x_test, normalize=True):
 
     # 改变形状格式
     x_train = x_train.reshape(-1, 1, x_train.shape[1])
-    # y_train = y_train.reshape(-1, 1, 1)
     x_test = x_test.reshape(-1, 1, x_test.shape[1])
 
     # 转换成 tensor

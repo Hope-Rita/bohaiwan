@@ -5,7 +5,7 @@ np.random.seed(1337)  # for reproducibility
 
 class MinMaxNormal(object):
     """
-        MinMax Normalization --> [-1, 1]
+        MinMax Normalization -> [-1, 1]
         x = (x - min) / (max - min).
         x = x * 2 - 1
     """

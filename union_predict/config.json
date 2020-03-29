@@ -1,6 +1,6 @@
 {
     "predict-target":"taseometer",
-    "predict-col":"FSS_S01_B1_004",
+    "predict-col":"FSS_S01_B3_007",
     "data-parameters":{
         "pred-len":5,
         "future-days":14,
@@ -8,12 +8,12 @@
     },
     "model-parameters":{
         "lstm":{
-            "model-hidden-size":15,
+            "model-hidden-size":3,
             "rnn-hidden-size":15,
             "gru-hidden-size":15,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.001,
+            "learning-rate":0.03,
             "epoch-num":300
         },
         "mlp":{
