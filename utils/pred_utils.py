@@ -11,13 +11,14 @@ def predict_one_cols(func, data):
 
     # 对数据和模型进行合法性检查
     if not callable(func):
-        raise ValueError('为提供用于预测的方法')
+        raise ValueError('未提供用于预测的方法')
     if type(data) is not dict:
         raise TypeError('数据格式有误')
 
     result_list = []
     for column in data:
         # 调用模型进行预测，得到预测结果
+        print(f'当前列: {column}')
         pred = func(x_train=data[column][0], y_train=data[column][1], x_test=data[column][2])
 
         # 将预测结果与测试集进行比较，得到评估指标

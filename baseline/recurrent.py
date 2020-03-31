@@ -1,5 +1,4 @@
 import numpy as np
-import time
 import torch
 from torch import nn
 from torch import optim
@@ -235,12 +234,11 @@ def train_model(model, data_loader):
     min_loss = np.inf
     min_epoch = 0
 
-    start_time = time.time()
     with trange(epoch_num) as t:
 
         for epoch in t:
 
-            t.set_description(f'[epoch: {epoch}], lr={learning_rate}, time usage: {int(time.time() - start_time)}s')
+            t.set_description(f'[epoch: {epoch}, lr:{learning_rate}]')
             model.train()
 
             train_loss = 0.0

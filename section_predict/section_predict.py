@@ -12,13 +12,13 @@ from baseline import mlp
 from baseline import recurrent
 from baseline import svr
 from baseline import xgb
-from union_predict import gen_dataset
+from section_predict import gen_dataset
 from utils import data_process
 from utils.config import get_config
 
 
 # 存放预测结果文件的路径
-res_dir1, res_dir2 = get_config('section_config.json', 'predict-result', inner_keys=['result1', 'result2'])
+res_dir1, res_dir2 = get_config('config.json', 'predict-result', inner_keys=['result1', 'result2'])
 
 
 def scheme1(filename, section):
@@ -53,9 +53,9 @@ def predict_one_cols(func, data, filename):
 
 
 if __name__ == '__main__':
-    pred_target = get_config('section_config.json', 'predict-target')
+    pred_target = get_config('config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     # scheme1(pred_target_filename, 'S01')
 
     pred_data = gen_dataset.load_section(pred_target_filename, 'S01')
-    predict_one_cols(recurrent.lstm_section_predict, pred_data, pred_target_filename)
+    predict_one_cols(lr.lr_predict, pred_data, pred_target_filename)

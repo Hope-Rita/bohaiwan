@@ -15,15 +15,18 @@ pred_len, future_days, env_factor_num = get_config(config_path,
 print(f'从{config_path}载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
-def gen_data(filename, col_id, add_date=False):
+def gen_section_data(filename, col_id, add_date=False):
     """
-    生成一个列的数据集
+    生成某一 section 的数据集
     :param filename: 数据来源的文件
     :param col_id: 列号
     :param add_date: 是否返回预测那天的日期
-    :return: x in shape(m, pred_len + env_factor_len), y in shape(m,)
+    :return: x 是该 section 上所有列的时间序列加上环境因素， y 是 col_id 列在预测那天的数值
+             x in shape(m, pred_len * col_num + env_factor_len), y in shape(m,)
     """
-    return produce_dataset(filename, col_id, add_date=add_date)
+    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
+    neighbors = get_section_neighbors(col_id, frame.columns)  # 与 col_id 同 section 的邻居
+    return produce_dataset(filename, col_id, section_neighbors=neighbors, add_date=add_date)
 
 
 def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
@@ -83,49 +86,39 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
         return data_process.col_normalization(np.array(x)), np.array(y)
 
 
-def load_one_col(filname, col, add_date=False, random_pick=False):
+def load_section(filename, section):
     """
-    载入给定列的数据
-    :param filname: 存放数据的 CSV 文件
-    :param col: 指定的列号
-    :param add_date: 是否增加日期序列
-    :param random_pick: 在划分数据集的时候是否随机选取
-    :return: 四个数据集
-    """
-    return ld.load_one_col(filname, col, load_func=gen_data, add_date=add_date)
-
-
-def load_cols(filename, random_pick=False):
-    """
-    分别导入各列数据，并进行划分
-    :param filename: 存放数据的 csv 文件路径
-    :param random_pick: 是否随机选取数据集
-    :return: dict(numpy.ndarray) key 是列名
+    加载一个 section 中所有列的 section 数据集
+    section 数据集指的是，针对给定的 col，与它在同一个 section 上所有列上的时间序列所组成的数据集
+    :param filename: 存放数据的文件
+    :param section: section 名，格式为 SXX
+    :return: dict(key=col_name, value=section_data)
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_cols(filename, cols=frame.columns, load_func=gen_data, random_pick=random_pick)
+    section_members = get_section_members(section, frame.columns)
+    return ld.load_cols(filename, cols=section_members, load_func=gen_section_data)
 
 
-def load_every_col(filename):
+def load_full_section():
+    pass
+
+
+def get_section_neighbors(col, cols):
     """
-    载入训练集和测试集，训练集是整体的，测试集是分列的
-    :param filename: 存放数据的 csv 文件路径
-    :return: x_train, y_train 是 numpy 数组, test_data 是 dict((x_test, y_test))
+    得到某个传感器（列）在同一个 Section 的邻居(包括其本身)
+    :param col: 目标列
+    :param cols: 所有列
+    :return: 邻居列表
     """
-    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_every_col(filename, cols=frame.columns, load_func=gen_data, random_pick=True)
+    section = col.split('_')[1]
+    return [c for c in cols if section in c]
 
 
-def load_all(filename):
+def get_section_members(section_name, cols):
     """
-    载入所有列，并划分训练集和测试集
-    :param filename: 存放数据的 csv 文件路径
-    :return: 四个 numpy 数组
+    给定一个 section，取出在这个 section 所有成员
+    :param section_name: section 的名字，格式为 Sxx
+    :param cols: 所有的列
+    :return: 该 section 上所有成员的列表
     """
-    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_all(filename, cols=frame.columns, load_func=gen_data)
-
-
-def get_all_col_name(filename):
-    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return frame.columns
+    return [col for col in cols if section_name in col]

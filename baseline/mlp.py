@@ -3,7 +3,7 @@ from sklearn.neural_network import MLPRegressor
 from utils.config import get_config
 
 
-hidden_size = tuple(get_config('../union_predict/section_config.json', 'model-parameters', 'mlp', 'hidden-size'))
+hidden_size = tuple(get_config('../section_predict/config.json', 'model-parameters', 'mlp', 'hidden-size'))
 
 
 def mlp_predict(x_train, y_train, x_test):
