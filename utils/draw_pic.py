@@ -37,7 +37,7 @@ def metric_for_cols():
     plt.show()
 
 
-def compare(y, pred, col_name, title_info=None):
+def compare(y, pred, col_name, save_path, title_info=None):
     plt.figure(figsize=(15, 8))
     plt.plot(pred, color='green', label='predict')
     plt.plot(y, label='truth')
@@ -46,4 +46,8 @@ def compare(y, pred, col_name, title_info=None):
         plt.title(title_info)
 
     plt.legend()
-    plt.savefig(f'../pics/{col_name}.jpg')
+
+    # 保存图像, 如果路径不存在则要新建
+    if not os.path.exists(save_path['dir']):
+        os.makedirs(save_path['dir'])
+    plt.savefig(os.path.join(save_path['dir'], save_path['filename']))

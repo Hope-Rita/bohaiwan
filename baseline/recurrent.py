@@ -4,12 +4,13 @@ import torch
 from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm import trange
 from utils import normalization
 from utils.config import get_config
 from utils.metric import RMSELoss
 
 
-config_path = '../union_predict/pred_len_survey.json'
+config_path = '../union_predict/config.json'
 # 参数加载
 device = torch.device(get_config(config_path, 'device', 'cuda') if torch.cuda.is_available() else 'cpu')
 model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
@@ -235,31 +236,33 @@ def train_model(model, data_loader):
     min_epoch = 0
 
     start_time = time.time()
-    for epoch in range(epoch_num):
+    with trange(epoch_num) as t:
 
-        print(f'[epoch: {epoch}], lr={learning_rate}, time usage: {int(time.time() - start_time)}s')
-        model.train()
+        for epoch in t:
 
-        train_loss = 0.0
-        for i, data in enumerate(data_loader):
-            x, y = data
+            t.set_description(f'[epoch: {epoch}], lr={learning_rate}, time usage: {int(time.time() - start_time)}s')
+            model.train()
 
-            with torch.set_grad_enabled(True):
-                pred_y = model(x)
-                loss = rmse(pred_y, y)
-                train_loss += loss.item() * len(x)
+            train_loss = 0.0
+            for i, data in enumerate(data_loader):
+                x, y = data
 
-                opt.zero_grad()
-                loss.backward()
-                opt.step()
+                with torch.set_grad_enabled(True):
+                    pred_y = model(x)
+                    loss = rmse(pred_y, y)
+                    train_loss += loss.item() * len(x)
 
-        train_loss /= len(data_loader.dataset)
-        if train_loss < min_loss:
-            min_loss = train_loss
-            min_epoch = epoch
-        print(f'min_loss:{min_loss}, min_epoch:{min_epoch}')
+                    opt.zero_grad()
+                    loss.backward()
+                    opt.step()
 
-        scheduler.step(loss)  # 更新学习率
+            train_loss /= len(data_loader.dataset)
+            if train_loss < min_loss:
+                min_loss = train_loss
+                min_epoch = epoch
+            t.set_postfix(min_loss=min_loss, min_epoch=min_epoch)
+
+            scheduler.step(loss)  # 更新学习率
 
     return model
 

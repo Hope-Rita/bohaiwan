@@ -89,6 +89,12 @@ def predict_all_data(func, filename):
     print(metric.all_metric(y_test, pred))
 
 
+def analysis_all_cols(filename, func):
+    cols = gen_dataset.get_all_col_name(filename)
+    for col in cols:
+        predict_one_col(filename, col, func)
+
+
 def predict_one_col(filename, col, func, is_draw_pic=True):
     """
     使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检查测试
@@ -100,13 +106,14 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
     x_train, y_train, x_test, y_test, dates = gen_dataset.load_one_col(filename, col, add_date=True)
     pred = func(x_train, y_train, x_test)
     print(metric.all_metric(y_test, pred))
-    data_process.dump_pred_result('onecol_pred_result', f'{func.__name__}_{col}.csv', y_test, pred, dates)
+    data_process.dump_pred_result(f'onecol_pred_result/{func.__name__}/metrics', f'{col}.csv', y_test, pred, dates)
 
     # 画个比较图
     if is_draw_pic:
         draw_pic.compare(y=np.concatenate((y_train, y_test)),
                          pred=np.concatenate((y_train, pred)),
                          col_name=col,
+                         save_path={'dir': f'onecol_pred_result/{func.__name__}/pics', 'filename': f'{col}.jpg'},
                          title_info=(func.__name__ + ' ' + col)
                          )
 
@@ -116,6 +123,7 @@ if __name__ == '__main__':
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     pred_col = get_config('config.json', 'predict-col')
 
+    # analysis_all_cols(pred_target_filename, xgb.xgb_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
     target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     predict_one_cols(recurrent.lstm_union_predict, target_data, pred_target_filename)

@@ -10,11 +10,12 @@ def predict(model, x_test):
 
 
 def model_fit(x_train, y_train):
-    model = xgb.XGBRegressor(learning_rate=0.1,
-                             max_depth=15,
-                             gamma=1e-3,
+    model = xgb.XGBRegressor(learning_rate=0.3,
+                             max_depth=2,
+                             gamma=0,
                              n_estimators=20,
                              objective='reg:squarederror'
                              )
+    print('max_depth', model.max_depth)
     model.fit(x_train, y_train)
     return model

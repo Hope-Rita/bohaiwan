@@ -53,7 +53,9 @@ def dump_pred_result(dirname, filename, y, pred, date):
     :param date: 日期，这里是所有的日期，要截断
     """
     df = pd.DataFrame({'truth': y, 'predict': pred}, index=date[-len(y):])
-    # df = pd.DataFrame({'truth': y, 'predict': pred, 'date': date[-len(y):]})
+
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
     df.to_csv(os.path.join(dirname, filename), index_label='date')
 
 

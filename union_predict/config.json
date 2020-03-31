@@ -1,5 +1,5 @@
 {
-    "predict-target":"taseometer",
+    "predict-target":"taseometer-debug",
     "predict-col":"FSS_S01_B3_007",
     "data-parameters":{
         "pred-len":14,

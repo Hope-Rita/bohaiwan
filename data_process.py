@@ -31,13 +31,14 @@ def process_data(frame, diff=False):
 def date_format(frame):
     for i in range(len(frame)):
         d = frame.loc[i, 'date']
-        s = d.split('/')
+        d = d.split(' ')[0]
+        s = d.split('-')
 
         frame.loc[i, 'date'] = datetime.date(int(s[0]), int(s[1]), int(s[2]))
 
     return frame
 
 
-f = pd.read_csv(name2)
-f = process_data(f, True)
-f.to_csv(name2, index=False)
+f = pd.read_csv('data/taseometer-full.csv')
+f = date_format(f)
+f.to_csv('data/taseometer-full.csv', index=False)

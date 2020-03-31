@@ -21,8 +21,10 @@ def predict_one_cols(func, data):
         pred = func(x_train=data[column][0], y_train=data[column][1], x_test=data[column][2])
 
         # 将预测结果与测试集进行比较，得到评估指标
+        pred = pred.reshape(-1)
+        y_true = data[column][3]
         d = {'Column': column}
-        metric_dict = metric.all_metric(y=data[column][3], pred=pred.reshape(-1))
+        metric_dict = metric.all_metric(y=y_true, pred=pred)
         d.update(metric_dict)
 
         result_list.append(d)

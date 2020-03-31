@@ -5,13 +5,14 @@ from utils.config import get_config
 from utils import data_process
 
 
+config_path = 'config.json'
 weather = get_config('../data/data.json', 'weather', 'server')
 waterline = get_config('../data/data.json', 'waterline', 'server')
-pred_len, future_days, env_factor_num = get_config('pred_len_survey.json',
+pred_len, future_days, env_factor_num = get_config(config_path,
                                                    'data-parameters',
                                                    inner_keys=['pred-len', 'future-days', 'env-factor-num']
                                                    )
-print(f'载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
+print(f'从{config_path}载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
 def gen_data(filename, col_id, add_date=False):
@@ -154,6 +155,11 @@ def load_section(filename, section):
 
 def load_full_section():
     pass
+
+
+def get_all_col_name(filename):
+    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
+    return frame.columns
 
 
 def get_section_neighbors(col, cols):
