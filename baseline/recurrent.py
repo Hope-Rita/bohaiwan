@@ -1,10 +1,12 @@
 import numpy as np
 import torch
-from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import trange
 from utils.config import *
+from baseline.recurrent_reg import RNNReg, GRUReg, LSTMReg
+from baseline.recurrent_fusion import RNNFusion, GRUFusion, LSTMFusion
+from baseline.recurrent_section_fusion import LSTMSectionFusion
 from utils import normalization
 from utils.metric import RMSELoss
 
@@ -21,161 +23,7 @@ gru_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'gru
 lstm_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
 
 # 加载数据参数
-pred_len, env_factor_num =\
-    global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
-
-
-class RegBase(nn.Module):
-
-    def __init__(self, hidden_size, output_size=1):
-        super(RegBase, self).__init__()
-        self.reg = nn.Linear(hidden_size, output_size)
-
-    def forward(self, rnn_output):
-        s, b, h = rnn_output.shape
-        rnn_output = rnn_output.view(s * b, h)
-        res = self.reg(rnn_output)
-        res = res.view(s, b, -1)
-        return res
-
-
-class RNNReg(RegBase):
-
-    def __init__(self, input_size, hidden_size=rnn_hidden_size, output_size=1):
-        super(RNNReg, self).__init__(hidden_size, output_size)
-        self.rnn = nn.RNN(input_size, hidden_size)
-
-    def forward(self, x):
-        x, _ = self.rnn(x.permute(2, 0, 1))
-        return super().forward(x)
-
-
-class GRUReg(RegBase):
-
-    def __init__(self, input_size, hidden_size=gru_hidden_size, output_size=1):
-        super(GRUReg, self).__init__(hidden_size, output_size)
-        self.gru = nn.GRU(input_size, hidden_size)
-
-    def forward(self, x):
-        x, _ = self.gru(x.permute(2, 0, 1))
-        return super().forward(x)
-
-
-class LSTMReg(RegBase):
-
-    def __init__(self, input_size, hidden_size=lstm_hidden_size, output_size=1):
-        super(LSTMReg, self).__init__(hidden_size, output_size)
-        self.lstm = nn.LSTM(input_size, hidden_size)
-
-    def forward(self, x):
-        x, _ = self.lstm(x.permute(2, 0, 1))
-        return super().forward(x)
-
-
-class FusionBase(nn.Module):
-
-    def __init__(self, time_series_len, input_features, hidden_size, output_size=1):
-        """
-        :param time_series_len: 时间序列的长度
-        :param input_features: 每个时间点元素的特征数
-        :param hidden_size: 隐单元数量
-        :param output_size: 输出规模
-        """
-        super(FusionBase, self).__init__()
-        self.fc_fusion = nn.Linear(hidden_size + env_factor_num, output_size)
-        self.time_series_len = time_series_len
-
-    def forward(self, rnn_output, env_factor_vec):
-        s, b, h = rnn_output.shape
-        rnn_output = rnn_output.view(s * b, h)
-        env_factor_vec = env_factor_vec.view(env_factor_vec.shape[0] * env_factor_vec.shape[1], -1)
-
-        x = torch.cat((rnn_output, env_factor_vec), dim=1)
-        res = self.fc_fusion(x)
-        res = res.view(-1)
-        return res
-
-
-class RNNFusion(FusionBase):
-
-    def __init__(self, time_series_len, hidden_size=rnn_hidden_size, output_size=1):
-        super(RNNFusion, self).__init__(time_series_len, hidden_size, output_size)
-        self.rnn = nn.RNN(time_series_len, hidden_size)
-
-    def forward(self, input_x, _=None):
-        x = input_x[:, :, :self.time_series_len]
-        e = input_x[:, :, self.time_series_len:]
-        x, _ = self.rnn(x.permute(2, 0, 1))
-
-        return super().forward(x, e)
-
-
-class GRUFusion(FusionBase):
-
-    def __init__(self, time_series_len, hidden_size=gru_hidden_size, output_size=1):
-        super(GRUFusion, self).__init__(time_series_len, hidden_size, output_size)
-        self.gru = nn.GRU(time_series_len, hidden_size)
-
-    def forward(self, input_x, _=None):
-        x = input_x[:, :, :self.time_series_len]
-        e = input_x[:, :, self.time_series_len:]
-        x, _ = self.gru(x.permute(2, 0, 1))
-
-        return super(GRUFusion, self).forward(x, e)
-
-
-class LSTMFusion(FusionBase):
-
-    def __init__(self, time_series_len, input_feature, hidden_size=lstm_hidden_size, output_size=1):
-        super(LSTMFusion, self).__init__(time_series_len, input_feature, hidden_size, output_size)
-        self.lstm = nn.LSTM(input_size=input_feature, hidden_size=hidden_size)
-
-    def forward(self, input_x, _=None):
-        x = input_x[:, :, :self.time_series_len]
-        x = x.permute(2, 0, 1)  # LSTM 的输入为 (seq_len, batch, input_size)
-        e = input_x[:, :, self.time_series_len:]
-        output, (hn, cn) = self.lstm(x)
-        return super().forward(hn, e)
-
-
-class SectionFusion(nn.Module):
-
-    def __init__(self, time_series_len, env_factor_len, fc_hidden_size, output_size=1):
-        super(SectionFusion, self).__init__()
-        self.fc_fusion = nn.Linear(fc_hidden_size, output_size)
-        self.time_series_len = time_series_len
-        self.env_factor_len = env_factor_len
-
-    def forward(self, rnn_output, env_factor_vec):
-        s, b, h, c = rnn_output.shape
-        rnn_output = rnn_output.view(s * b, h * c)
-        env_factor_vec = env_factor_vec.view(env_factor_vec.shape[0] * env_factor_vec.shape[1], -1)
-
-        x = torch.cat((rnn_output, env_factor_vec), dim=1)
-        res = self.fc_fusion(x)
-        res = res.view(s, b, -1)
-        return res
-
-
-class LSTMSectionFusion(SectionFusion):
-
-    def __init__(self, seq_len, time_series_len, env_factor_len, hidden_size=lstm_hidden_size, output_size=1):
-        super(LSTMSectionFusion, self).__init__(time_series_len, env_factor_len, seq_len - env_factor_len)
-        self.lstm = nn.LSTM(time_series_len, hidden_size)
-
-    def forward(self, input_x, _=None):
-        x = input_x[:, :, :-self.env_factor_len]
-        e = input_x[:, :, -self.env_factor_len:]
-
-        s, b, h = x.shape
-        print(x[0][0])
-        x = x.view(s, b, self.time_series_len, h // self.time_series_len)
-        print(x[0][0])
-        print(x.shape)
-        print(e.shape)
-        x, _ = self.lstm(x)
-
-        return super().forward(x, e)
+pred_len, env_factor_num = global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 
 
 def union_predict(model, x_train, y_train, x_test):
@@ -195,12 +43,12 @@ def lstm_union_predict(x_train, y_train, x_test):
 
 
 def gru_union_predict(x_train, y_train, x_test):
-    model = GRUFusion(time_series_len=pred_len).to(device)
+    model = GRUFusion(time_series_len=pred_len, input_feature=1).to(device)
     return union_predict(model, x_train, y_train, x_test)
 
 
 def rnn_union_predict(x_train, y_train, x_test):
-    model = RNNFusion(time_series_len=pred_len).to(device)
+    model = RNNFusion(time_series_len=pred_len, input_feature=1).to(device)
     return union_predict(model, x_train, y_train, x_test)
 
 

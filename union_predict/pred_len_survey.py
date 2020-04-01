@@ -65,7 +65,7 @@ def metric_plot(frame, keyword):
     plt.savefig(f'pred_len_survey_{keyword}.jpg')
 
 
-def avg_metric_plot(frame, keyword):
+def avg_metric_plot(frame, keyword, model_ame):
     key_cols = [col for col in frame.columns if keyword in col]
 
     x = []
@@ -77,7 +77,7 @@ def avg_metric_plot(frame, keyword):
     plt.cla()
     plt.plot(x, y)
     plt.title(keyword)
-    plt.savefig(f'pred_len_survey_{keyword}.png')
+    plt.savefig(f'pred_len_{model_ame}_{keyword}.png')
 
 
 def merge_result(frame_list):
@@ -115,11 +115,11 @@ def assemble_frame(metric_list, k_day):
 
 
 if __name__ == '__main__':
-
-    produce_result(recurrent.lstm_union_predict)
+    pred_model = recurrent.rnn_union_predict
+    produce_result(pred_model)
 
     # 绘图
     df = pd.read_csv('pred_len_survey.csv', index_col='Column')
-    avg_metric_plot(df, 'MAPE')
-    avg_metric_plot(df, 'PCC')
-    avg_metric_plot(df, 'RMSE')
+    avg_metric_plot(df, 'MAPE', pred_model.__name__)
+    avg_metric_plot(df, 'PCC', pred_model.__name__)
+    avg_metric_plot(df, 'RMSE', pred_model.__name__)
