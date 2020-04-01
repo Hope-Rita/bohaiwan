@@ -1,9 +1,9 @@
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
-from utils.config import get_config
 
 
 def lr_pca_predict(x_train, y_train, x_test):
+    from utils.config import get_config
     estimator = PCA(n_components=get_config('../section_predict/config.json',
                                             'model-parameters',
                                             'lr',

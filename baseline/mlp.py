@@ -1,9 +1,9 @@
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
-from utils.config import get_config
+from utils.config import *
 
 
-hidden_size = tuple(get_config('../section_predict/config.json', 'model-parameters', 'mlp', 'hidden-size'))
+hidden_size = tuple(global_config.get_config('model-parameters', 'mlp', 'hidden-size'))
 
 
 def mlp_predict(x_train, y_train, x_test):

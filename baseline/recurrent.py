@@ -4,28 +4,25 @@ from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import trange
+from utils.config import *
 from utils import normalization
-from utils.config import get_config
 from utils.metric import RMSELoss
 
 
-config_path = '../union_predict/config.json'
-# 参数加载
-device = torch.device(get_config(config_path, 'device', 'cuda') if torch.cuda.is_available() else 'cpu')
-model_hidden_size, num_workers, batch_size, epoch_num, learning_rate \
-    = get_config(config_path,
-                 'model-parameters',
-                 'lstm',
-                 inner_keys=['model-hidden-size',
-                             'num-workers',
-                             'batch-size',
-                             'epoch-num',
-                             'learning-rate'
-                             ]
-                 )
-rnn_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'rnn-hidden-size')
-gru_hidden_size = get_config(config_path, 'model-parameters', 'lstm', 'gru-hidden-size')
-pred_len, env_factor_num = get_config(config_path, 'data-parameters', inner_keys=['pred-len', 'env-factor-num'])
+# 加载模型参数
+device = torch.device(global_config.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
+num_workers, batch_size, epoch_num, learning_rate \
+    = global_config.get_config('model-parameters',
+                               'recurrent',
+                               inner_keys=['num-workers', 'batch-size', 'epoch-num', 'learning-rate']
+                               )
+rnn_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
+gru_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
+lstm_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
+
+# 加载数据参数
+pred_len, env_factor_num =\
+    global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 
 
 class RegBase(nn.Module):
@@ -66,7 +63,7 @@ class GRUReg(RegBase):
 
 class LSTMReg(RegBase):
 
-    def __init__(self, input_size, hidden_size=model_hidden_size, output_size=1):
+    def __init__(self, input_size, hidden_size=lstm_hidden_size, output_size=1):
         super(LSTMReg, self).__init__(hidden_size, output_size)
         self.lstm = nn.LSTM(input_size, hidden_size)
 
@@ -129,7 +126,7 @@ class GRUFusion(FusionBase):
 
 class LSTMFusion(FusionBase):
 
-    def __init__(self, time_series_len, input_feature, hidden_size=model_hidden_size, output_size=1):
+    def __init__(self, time_series_len, input_feature, hidden_size=lstm_hidden_size, output_size=1):
         super(LSTMFusion, self).__init__(time_series_len, input_feature, hidden_size, output_size)
         self.lstm = nn.LSTM(input_size=input_feature, hidden_size=hidden_size)
 
@@ -162,7 +159,7 @@ class SectionFusion(nn.Module):
 
 class LSTMSectionFusion(SectionFusion):
 
-    def __init__(self, seq_len, time_series_len, env_factor_len, hidden_size=model_hidden_size, output_size=1):
+    def __init__(self, seq_len, time_series_len, env_factor_len, hidden_size=lstm_hidden_size, output_size=1):
         super(LSTMSectionFusion, self).__init__(time_series_len, env_factor_len, seq_len - env_factor_len)
         self.lstm = nn.LSTM(time_series_len, hidden_size)
 

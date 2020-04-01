@@ -7,6 +7,7 @@
 
 import numpy as np
 import platform
+from utils.config import *
 import utils.pred_utils as pu
 from baseline import lr
 from baseline import mlp
@@ -17,12 +18,9 @@ from union_predict import gen_dataset
 from utils import data_process
 from utils import draw_pic
 from utils import metric
-from utils.config import get_config
 
 
-# 存放预测结果文件的路径
-res_dir1 = get_config('config.json', 'predict-result', 'result1', 'server')
-res_dir2 = get_config('config.json', 'predict-result', 'result2', 'server')
+res_dir1, res_dir2 = None, None
 
 
 def predict_every_col(filename):
@@ -119,6 +117,10 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
 
 
 if __name__ == '__main__':
+    # 存放预测结果文件的路径
+    res_dir1 = get_config('config.json', 'predict-result', 'result1', 'server')
+    res_dir2 = get_config('config.json', 'predict-result', 'result2', 'server')
+
     pred_target = get_config('config.json', 'predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     pred_col = get_config('config.json', 'predict-col')

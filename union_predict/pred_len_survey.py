@@ -1,25 +1,22 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import utils.pred_utils as pu
+from utils.config import *
 from baseline import lr
 from baseline import recurrent
 from baseline import mlp
 from baseline import svr
 from baseline import xgb
 from union_predict import predict
-from utils import config
 from utils import data_process
 from union_predict import gen_dataset
 from importlib import reload
 
 
-config_path = 'pred_len_survey.json'
-
-
 def produce_result(func):
     # 跑多次试验，收集结果
     res = []
-    for pred_len in range(5, 17):
+    for pred_len in range(5, 21):
         # mlp.hidden_size = (pred_len + 1) // 2
         # mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
         res.append(k_day_predict(func, pred_len))
@@ -38,7 +35,7 @@ def k_day_predict(pred_func, k):
     :return: 模型产生的指标，类型为 DataFrame
     """
     # 修改 config
-    config.modify_config(config_path, 'data-parameters', 'pred-len', new_val=k)
+    global_config.modify_config('data-parameters', 'pred-len', new_val=k)
 
     # 重新 import 更新 pred-len 参数
     reload(gen_dataset)
@@ -46,8 +43,8 @@ def k_day_predict(pred_func, k):
 
     print('当前的 pred-len 为', gen_dataset.pred_len)
     # 载入数据
-    pred_target = config.get_config('pred_len_survey.json', 'predict-target')
-    pred_target_filename = config.get_config('../data/data.json', pred_target, 'server')
+    pred_target = global_config.get_config('predict-target')
+    pred_target_filename = global_config.get_data_loc(pred_target)
     data = gen_dataset.load_cols(pred_target_filename)
 
     # 测试模型, 返回结果
@@ -77,10 +74,10 @@ def avg_metric_plot(frame, keyword):
         x.append(int(col[:col.index('d')]))
         y.append(data_process.avg(frame.loc[:, col]))
 
+    plt.cla()
     plt.plot(x, y)
-    # plt.legend()
     plt.title(keyword)
-    plt.show()
+    plt.savefig(f'pred_len_survey_{keyword}.png')
 
 
 def merge_result(frame_list):
@@ -123,7 +120,6 @@ if __name__ == '__main__':
 
     # 绘图
     df = pd.read_csv('pred_len_survey.csv', index_col='Column')
-    # metric_plot(df, 'PCC')
     avg_metric_plot(df, 'MAPE')
     avg_metric_plot(df, 'PCC')
     avg_metric_plot(df, 'RMSE')
