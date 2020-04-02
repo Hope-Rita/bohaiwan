@@ -77,7 +77,7 @@ def avg_metric_plot(frame, keyword, model_ame):
     plt.cla()
     plt.plot(x, y)
     plt.title(keyword)
-    plt.savefig(f'pred_len_{model_ame}_{keyword}.png')
+    plt.savefig(f'pred_len_survey/{model_ame}_{keyword}.png')
 
 
 def merge_result(frame_list):
@@ -115,7 +115,7 @@ def assemble_frame(metric_list, k_day):
 
 
 if __name__ == '__main__':
-    pred_model = recurrent.rnn_union_predict
+    pred_model = recurrent.lstm_union_predict
     produce_result(pred_model)
 
     # 绘图

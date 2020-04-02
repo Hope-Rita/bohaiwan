@@ -63,5 +63,5 @@ class Config(object):
         return self._data_config_dict[data_name]['local' if local else 'server']
 
 
-config_path = '../union_predict/pred_len_survey.json'
+config_path = '../union_predict/config.json'
 global_config = Config(config_path)

@@ -118,15 +118,15 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
 
 if __name__ == '__main__':
     # 存放预测结果文件的路径
-    res_dir1 = get_config('config.json', 'predict-result', 'result1', 'server')
-    res_dir2 = get_config('config.json', 'predict-result', 'result2', 'server')
+    res_dir1 = global_config.get_config('predict-result', 'result1', 'server')
+    res_dir2 = global_config.get_config('predict-result', 'result2', 'server')
 
-    pred_target = get_config('config.json', 'predict-target')
-    pred_target_filename = get_config('../data/data.json', pred_target, 'server')
-    pred_col = get_config('config.json', 'predict-col')
+    pred_target = global_config.get_config('predict-target')
+    pred_target_filename = global_config.get_data_loc(pred_target)
+    pred_col = global_config.get_config('predict-col')
 
     # analysis_all_cols(pred_target_filename, xgb.xgb_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
     target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    predict_one_cols(recurrent.lstm_union_predict, target_data, pred_target_filename)
+    predict_one_cols(recurrent.gru_union_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)

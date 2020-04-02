@@ -59,7 +59,7 @@ class GRUFusion(FusionBase):
         x = input_x[:, :, :self.time_series_len]
         x = x.permute(2, 0, 1)
         e = input_x[:, :, self.time_series_len:]
-        output, (hn, cn) = self.gru(x)
+        output, hn = self.gru(x)
         return super(GRUFusion, self).forward(hn, e)
 
 

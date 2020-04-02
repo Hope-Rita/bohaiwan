@@ -75,9 +75,9 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
 
     # 对样本集进行归一化，结果集不需要归一化
     if add_date:
-        return data_process.col_normalization(np.array(x)), np.array(y), np.array(predict_dates)
+        return np.array(x), np.array(y), np.array(predict_dates)
     else:
-        return data_process.col_normalization(np.array(x)), np.array(y)
+        return np.array(x), np.array(y)
 
 
 def load_one_col(filname, col, add_date=False, random_pick=False):
