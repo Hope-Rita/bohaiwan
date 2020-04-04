@@ -20,25 +20,29 @@ def split_date(frame):
     return res
 
 
-def dump_csv(dirname, filename, data, avg=None):
+def dump_csv(dirname, filename, data, average_func=None):
     """
     把统计结果的 DataFrame 写到 CSV 文件中
     :param dirname: 路径名
     :param filename: 写入的文件名
     :param data: 写入的数据，格式为 List[dict]
-    :param avg: 求均值的方法
+    :param average_func: 求均值的方法
     """
+
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
     df = pd.DataFrame(data)
     filename = os.path.join(dirname, filename)
     df.to_csv(filename, index=False)
     print('完成预测，已写入', filename)
 
-    if avg:
+    if average_func:
         # 统计总体的平均 RMSE, MAE 和 PCC
-        print('RMSE', avg(df.loc[:, 'RMSE']))
-        print('MAE', avg(df.loc[:, 'MAE']))
-        print('MAPE', avg(df.loc[:, 'MAPE']))
-        print('PCC', avg(df.loc[:, 'PCC']))
+        print('RMSE', average_func(df.loc[:, 'RMSE']))
+        print('MAE', average_func(df.loc[:, 'MAE']))
+        print('MAPE', average_func(df.loc[:, 'MAPE']))
+        print('PCC', average_func(df.loc[:, 'PCC']))
 
     print()
 

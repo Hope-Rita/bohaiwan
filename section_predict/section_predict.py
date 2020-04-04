@@ -49,7 +49,7 @@ def predict_one_cols(func, data, filename):
 
     # 写入 CSV 文件
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
-    data_process.dump_csv(res_dir1, csv_name, cols_metrics, avg=data_process.avg)
+    data_process.dump_csv(res_dir1, csv_name, cols_metrics, average_func=data_process.avg)
 
 
 if __name__ == '__main__':

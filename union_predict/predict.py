@@ -44,7 +44,7 @@ def predict_every_col(filename):
 
         # 写到 CSV 文件里
         csv_name = func.__name__.split('.')[-1] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
-        data_process.dump_csv(res_dir1, csv_name, result_list, avg=data_process.avg)
+        data_process.dump_csv(res_dir1, csv_name, result_list, average_func=data_process.avg)
 
 
 def scheme2(filename):
@@ -76,7 +76,7 @@ def predict_one_cols(func, data, filename):
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
     csv_name += filename.split('\\')[-1] if platform.system() is 'Windows' else filename.split('/')[-1]
 
-    data_process.dump_csv(res_dir2, csv_name, cols_metrics, avg=data_process.avg)
+    data_process.dump_csv(res_dir2, csv_name, cols_metrics, average_func=data_process.avg)
 
 
 def predict_all_data(func, filename):
@@ -128,5 +128,5 @@ if __name__ == '__main__':
     # analysis_all_cols(pred_target_filename, xgb.xgb_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
     target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    predict_one_cols(recurrent.gru_union_predict, target_data, pred_target_filename)
+    predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)

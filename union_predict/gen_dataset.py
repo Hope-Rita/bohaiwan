@@ -9,7 +9,7 @@ weather = global_config.get_data_loc('weather')
 waterline = global_config.get_data_loc('waterline')
 pred_len, future_days, env_factor_num = \
     global_config.get_config('data-parameters', inner_keys=['pred-len', 'future-days', 'env-factor-num'])
-print(f'配置文件：{config_path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
+print(f'\n配置文件：{config_path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
 def gen_data(filename, col_id, add_date=False):

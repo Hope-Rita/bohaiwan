@@ -16,7 +16,7 @@ from importlib import reload
 def produce_result(func):
     # 跑多次试验，收集结果
     res = []
-    for pred_len in range(5, 21):
+    for pred_len in range(5, 20):
         # mlp.hidden_size = (pred_len + 1) // 2
         # mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
         res.append(k_day_predict(func, pred_len))
@@ -24,7 +24,7 @@ def produce_result(func):
     result_frame = merge_result(res)
 
     # 写入 CSV
-    result_frame.to_csv('pred_len_survey.csv', index=True, index_label='Column')
+    result_frame.to_csv(f'pred_len_survey/metrics/{func.__name__}.csv', index=True, index_label='Column')
 
 
 def k_day_predict(pred_func, k):
@@ -77,7 +77,7 @@ def avg_metric_plot(frame, keyword, model_ame):
     plt.cla()
     plt.plot(x, y)
     plt.title(keyword)
-    plt.savefig(f'pred_len_survey/{model_ame}_{keyword}.png')
+    plt.savefig(f'pred_len_survey/pics/{model_ame}_{keyword}.png')
 
 
 def merge_result(frame_list):
@@ -115,11 +115,11 @@ def assemble_frame(metric_list, k_day):
 
 
 if __name__ == '__main__':
-    pred_model = recurrent.lstm_union_predict
+    pred_model = recurrent.gru_union_predict
     produce_result(pred_model)
 
     # 绘图
-    df = pd.read_csv('pred_len_survey.csv', index_col='Column')
+    df = pd.read_csv(f'pred_len_survey/metrics/{pred_model.__name__}.csv', index_col='Column')
     avg_metric_plot(df, 'MAPE', pred_model.__name__)
     avg_metric_plot(df, 'PCC', pred_model.__name__)
     avg_metric_plot(df, 'RMSE', pred_model.__name__)

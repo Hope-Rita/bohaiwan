@@ -8,11 +8,11 @@
     "model-parameters":{
         "recurrent":{
             "lstm-hidden-size":5,
-            "rnn-hidden-size":5,
-            "gru-hidden-size":5,
+            "rnn-hidden-size":15,
+            "gru-hidden-size":15,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.3,
+            "learning-rate":0.001,
             "epoch-num":300
         },
         "mlp":{
@@ -23,7 +23,7 @@
         }
     },
     "device":{
-        "cuda":"cuda:2",
+        "cuda":"cuda:3",
         "cpu":"cpu"
     }
 }
