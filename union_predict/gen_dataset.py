@@ -77,7 +77,7 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
     if add_date:
         return np.array(x), np.array(y), np.array(predict_dates)
     else:
-        return np.array(x), np.array(y)
+        return data_process.col_normalization(np.array(x)), np.array(y)
 
 
 def load_one_col(filname, col, add_date=False, random_pick=False):

@@ -51,12 +51,10 @@ def xgb():
 
     paras = {
         'max_depth': [depth for depth in range(1, 9)],
-        'learning_rate': [0.03, 0.1, 0.3, 1],
-        'n_estimators': [5, 10, 15, 20, 25, 30],
-        'gamma': [0, 1, 2, 3]
+        'n_estimators': [n for n in range(2, 32, 2)]
     }
 
-    test_func = XGBRegressor(objective='reg:squarederror')
+    test_func = XGBRegressor(objective='reg:squarederror', gamma=0, learning_rate=0.3)
     search_all_cols(test_func, paras, 'xgb')
 
 

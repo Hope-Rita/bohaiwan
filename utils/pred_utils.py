@@ -17,8 +17,10 @@ def predict_one_cols(func, data):
 
     result_list = []
     for column in data:
+
+        if any([name in func.__name__ for name in ['rnn', 'gru', 'lstm']]):
+            print(f'当前列: {column}')
         # 调用模型进行预测，得到预测结果
-        print(f'当前列: {column}')
         pred = func(x_train=data[column][0], y_train=data[column][1], x_test=data[column][2])
 
         # 将预测结果与测试集进行比较，得到评估指标

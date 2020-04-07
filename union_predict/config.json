@@ -3,7 +3,7 @@
     "predict-col":"FSS_S01_B3_007",
     "data-parameters":{
         "pred-len":14,
-        "future-days":14,
+        "future-days":7,
         "env-factor-num":3
     },
     "model-parameters":{

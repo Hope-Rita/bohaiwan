@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from tqdm import tqdm
 
 
 def load_all(filename, cols, load_func, random_pick=False):
@@ -18,8 +19,9 @@ def load_all(filename, cols, load_func, random_pick=False):
     x_test, y_test = list(), list()
 
     print(f'开始从{filename}载入数据')
-    for col in cols:
-        print('处理列：', col)
+    t = tqdm(cols)
+    for col in t:
+        t.set_description(f'处理列{col}')
         x, y = load_func(filename, col)
 
         splited_data = dataset_split(x, y, random_pick=random_pick)
@@ -48,8 +50,9 @@ def load_every_col(filename, cols, load_func, random_pick=False):
     test_data = {}
 
     print(f'开始从{filename}载入数据')
-    for col in cols:
-        print('处理列：', col)
+    t = tqdm(cols)
+    for col in t:
+        t.set_description(f'处理列{col}')
         x, y = load_func(filename, col)
 
         split_data = dataset_split(x, y, random_pick=random_pick, return_numpy=False)
@@ -86,8 +89,9 @@ def load_cols(filename, cols, load_func, random_pick=False):
     data = {}
 
     print(f'开始从{filename}载入数据')
-    for col in cols:
-        print('处理列：', col)
+    t = tqdm(cols)
+    for col in t:
+        t.set_description(f'处理列{col}')
         x, y = load_func(filename, col)
         data[col] = dataset_split(x, y, random_pick=random_pick)
 

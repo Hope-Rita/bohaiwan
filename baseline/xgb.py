@@ -13,9 +13,8 @@ def model_fit(x_train, y_train):
     model = xgb.XGBRegressor(learning_rate=0.3,
                              max_depth=2,
                              gamma=0,
-                             n_estimators=20,
+                             n_estimators=30,
                              objective='reg:squarederror'
                              )
-    print('max_depth', model.max_depth)
     model.fit(x_train, y_train)
     return model

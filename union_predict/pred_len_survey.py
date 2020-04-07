@@ -16,7 +16,7 @@ from importlib import reload
 def produce_result(func):
     # 跑多次试验，收集结果
     res = []
-    for pred_len in range(5, 20):
+    for pred_len in range(1, 21):
         # mlp.hidden_size = (pred_len + 1) // 2
         # mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
         res.append(k_day_predict(func, pred_len))
@@ -115,7 +115,7 @@ def assemble_frame(metric_list, k_day):
 
 
 if __name__ == '__main__':
-    pred_model = recurrent.gru_union_predict
+    pred_model = xgb.xgb_predict
     produce_result(pred_model)
 
     # 绘图
