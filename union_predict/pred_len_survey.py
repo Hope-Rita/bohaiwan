@@ -27,6 +27,10 @@ def produce_result(func):
     result_frame.to_csv(f'pred_len_survey/metrics/{func.__name__}.csv', index=True, index_label='Column')
 
 
+def repeat_run(n):
+    pass
+
+
 def k_day_predict(pred_func, k):
     """
     执行 pred-len 为 k 的预测

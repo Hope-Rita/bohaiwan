@@ -1,4 +1,6 @@
 from utils import metric
+from utils import data_process
+from utils import normalization
 
 
 def predict_one_cols(func, data):
@@ -18,18 +20,29 @@ def predict_one_cols(func, data):
     result_list = []
     for column in data:
 
+        x_train, y_train, x_test, y_test = data[column]
+
         if any([name in func.__name__ for name in ['rnn', 'gru', 'lstm']]):
+            # Recurrent 模型在训练时打印一下传感器的名字
             print(f'当前列: {column}')
+
+        # 普通模型的数据归一化，对 x_train 和 x_test 分别按列进行归一化
+        # x_train = data_process.col_normalization(x_train)
+        # x_test = data_process.col_normalization(x_test)
+        normal_y = normalization.MinMaxNormal([y_train, y_test])
+        y_train = normal_y.transform(y_train)
+
         # 调用模型进行预测，得到预测结果
-        pred = func(x_train=data[column][0], y_train=data[column][1], x_test=data[column][2])
+        pred = func(x_train=x_train, y_train=y_train, x_test=x_test)
 
         # 将预测结果与测试集进行比较，得到评估指标
         pred = pred.reshape(-1)
-        y_true = data[column][3]
         d = {'Column': column}
-        metric_dict = metric.all_metric(y=y_true, pred=pred)
+        pred = normal_y.inverse_transform(pred)
+        metric_dict = metric.all_metric(y=y_test, pred=pred)
         d.update(metric_dict)
 
+        # 预测结果添加到列表中进行汇总
         result_list.append(d)
 
     return result_list

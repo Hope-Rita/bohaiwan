@@ -3,7 +3,7 @@
     "predict-col":"FSS_S01_B3_007",
     "data-parameters":{
         "pred-len":14,
-        "future-days":7,
+        "future-days":14,
         "env-factor-num":3
     },
     "model-parameters":{
@@ -13,7 +13,7 @@
             "gru-hidden-size":20,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.003,
+            "learning-rate":0.01,
             "epoch-num":300
         },
         "mlp":{

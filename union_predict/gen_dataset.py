@@ -73,9 +73,8 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)
 
-    # 对样本集进行归一化，结果集不需要归一化
     if add_date:
-        return np.array(x), np.array(y), np.array(predict_dates)
+        return data_process.col_normalization(np.array(x)), np.array(y), np.array(predict_dates)
     else:
         return data_process.col_normalization(np.array(x)), np.array(y)
 
@@ -89,7 +88,7 @@ def load_one_col(filname, col, add_date=False, random_pick=False):
     :param random_pick: 在划分数据集的时候是否随机选取
     :return: 四个数据集
     """
-    return ld.load_one_col(filname, col, load_func=gen_data, add_date=add_date)
+    return ld.load_one_col(filname, col, load_func=gen_data, add_date=add_date, random_pick=random_pick)
 
 
 def load_cols(filename, random_pick=False):

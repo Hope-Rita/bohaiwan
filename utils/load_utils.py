@@ -21,7 +21,7 @@ def load_all(filename, cols, load_func, random_pick=False):
     print(f'开始从{filename}载入数据')
     t = tqdm(cols)
     for col in t:
-        t.set_description(f'处理列{col}')
+        t.set_description(f'处理列 {col}')
         x, y = load_func(filename, col)
 
         splited_data = dataset_split(x, y, random_pick=random_pick)
@@ -52,7 +52,7 @@ def load_every_col(filename, cols, load_func, random_pick=False):
     print(f'开始从{filename}载入数据')
     t = tqdm(cols)
     for col in t:
-        t.set_description(f'处理列{col}')
+        t.set_description(f'处理列 {col}')
         x, y = load_func(filename, col)
 
         split_data = dataset_split(x, y, random_pick=random_pick, return_numpy=False)
@@ -91,7 +91,7 @@ def load_cols(filename, cols, load_func, random_pick=False):
     print(f'开始从{filename}载入数据')
     t = tqdm(cols)
     for col in t:
-        t.set_description(f'处理列{col}')
+        t.set_description(f'处理列 {col}')
         x, y = load_func(filename, col)
         data[col] = dataset_split(x, y, random_pick=random_pick)
 

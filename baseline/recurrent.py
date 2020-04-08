@@ -27,13 +27,18 @@ pred_len, env_factor_num = global_config.get_config('data-parameters', inner_key
 
 
 def union_predict(model, x_train, y_train, x_test):
-    data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test, normalize=True)
+    # 加载数据
+    # data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test, normalize=True)
+    data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
 
+    # 训练模型
     model = train_model(model, data_loader)
+
+    # 将输出的结果进行处理并返回
     pred = model(x_test)
     pred = pred.data.to('cpu').numpy()
     pred = pred.reshape(-1)
-    pred = normal.inverse_transform(pred)
+    # pred = normal.inverse_transform(pred)
     return pred
 
 
@@ -113,10 +118,10 @@ def train_model(model, data_loader):
 def get_dataloader(x_train, y_train, x_test, normalize=True):
     normal = None
     if normalize:  # 归一化
-        normal = normalization.MinMaxNormal([x_train, y_train, x_test])
-        x_train = normal.transform(x_train)
+        normal = normalization.MinMaxNormal(y_train)
+        # x_train = normal.transform(x_train)
         y_train = normal.transform(y_train)
-        x_test = normal.transform(x_test)
+        # x_test = normal.transform(x_test)
 
     # 改变形状格式
     x_train = x_train.reshape(-1, 1, x_train.shape[1])
