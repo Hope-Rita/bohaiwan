@@ -125,7 +125,7 @@ if __name__ == '__main__':
     pred_target_filename = global_config.get_data_loc(pred_target)
     pred_col = global_config.get_config('predict-col')
 
-    # analysis_all_cols(pred_target_filename, xgb.xgb_predict)
+    # analysis_all_cols(pred_target_filename, lr.lr_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
     target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)

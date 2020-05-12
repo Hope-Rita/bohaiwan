@@ -1,5 +1,5 @@
 {
-    "predict-target":"taseometer",
+    "predict-target":"strainmeter",
     "predict-col":"FSS_S01_B3_007",
     "data-parameters":{
         "pred-len":14,
@@ -9,11 +9,11 @@
     "model-parameters":{
         "recurrent":{
             "lstm-hidden-size":15,
-            "rnn-hidden-size":20,
+            "rnn-hidden-size":25,
             "gru-hidden-size":20,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.01,
+            "learning-rate":0.03,
             "epoch-num":300
         },
         "mlp":{

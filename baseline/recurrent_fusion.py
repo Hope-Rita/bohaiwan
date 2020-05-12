@@ -11,6 +11,7 @@ lstm_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'ls
 # 加载数据参数
 pred_len, env_factor_num = global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 device = torch.device(global_config.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')
 
 
 class FusionBase(nn.Module):
@@ -64,7 +65,7 @@ class GRUFusion(FusionBase):
         x = x.permute(2, 0, 1)
         e = input_x[:, :, self.time_series_len:]
 
-        h_0 = torch.randn(1, x.shape[1], self.hidden_size)
+        h_0 = torch.randn(1, x.shape[1], self.hidden_size, device=device)
         output, hn = self.gru(x, h_0)
         return super(GRUFusion, self).forward(hn, e)
 
@@ -80,7 +81,7 @@ class LSTMFusion(FusionBase):
         x = x.permute(2, 0, 1)  # LSTM 的输入为 (seq_len, batch, input_size)
         e = input_x[:, :, self.time_series_len:]
 
-        h_0 = torch.randn(1, x.shape[1], self.hidden_size)
-        c_0 = torch.randn(1, x.shape[1], self.hidden_size)
+        h_0 = torch.randn(1, x.shape[1], self.hidden_size, device=device)
+        c_0 = torch.randn(1, x.shape[1], self.hidden_size, device=device)
         output, (hn, cn) = self.lstm(x, (h_0, c_0))
         return super().forward(hn, e)

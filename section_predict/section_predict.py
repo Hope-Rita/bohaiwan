@@ -14,7 +14,7 @@ from baseline import svr
 from baseline import xgb
 from section_predict import gen_dataset
 from utils import data_process
-from utils.config import get_config
+from utils.config import *
 
 
 # 存放预测结果文件的路径

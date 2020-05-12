@@ -13,10 +13,10 @@ from union_predict import gen_dataset
 from importlib import reload
 
 
-def produce_result(func):
+def produce_result(func, repeat_id=None):
     # 跑多次试验，收集结果
     res = []
-    for pred_len in range(1, 21):
+    for pred_len in range(5, 21):
         # mlp.hidden_size = (pred_len + 1) // 2
         # mlp.hidden_size = tuple([pred_len * 2, pred_len, pred_len // 2])
         res.append(k_day_predict(func, pred_len))
@@ -24,11 +24,13 @@ def produce_result(func):
     result_frame = merge_result(res)
 
     # 写入 CSV
-    result_frame.to_csv(f'pred_len_survey/metrics/{func.__name__}.csv', index=True, index_label='Column')
-
-
-def repeat_run(n):
-    pass
+    if repeat_id:
+        result_frame.to_csv(f'pred_len_survey/metrics/{func.__name__}_repeat{repeat_id}.csv',
+                            index=True,
+                            index_label='Column'
+                            )
+    else:
+        result_frame.to_csv(f'pred_len_survey/metrics/{func.__name__}.csv', index=True, index_label='Column')
 
 
 def k_day_predict(pred_func, k):
@@ -84,6 +86,27 @@ def avg_metric_plot(frame, keyword, model_ame):
     plt.savefig(f'pred_len_survey/pics/{model_ame}_{keyword}.png')
 
 
+def avg_box_plot(func, repeat_len):
+
+    def draw_box(keyword):
+        key_cols = [col for col in avg_frame.columns if keyword in col]
+        key_frame = avg_frame[key_cols]
+        plt.boxplot(key_frame.to_numpy(), labels=[int(col[:col.index('d')]) for col in key_cols])
+        plt.title(f'{func.__name__}_{keyword}')
+        plt.show()
+
+    avg_list = []
+    for i in range(1, repeat_len + 1):
+        filename = f'pred_len_survey/metrics/{func.__name__}_repeat{i}.csv'
+        df = pd.read_csv(filename, index_col='Column')
+        avg_list.append(df.mean(axis=0))
+
+    avg_frame = pd.DataFrame(avg_list)
+    draw_box('RMSE')
+    draw_box('PCC')
+    draw_box('MAPE')
+
+
 def merge_result(frame_list):
     """
     在 DataFrame 的层面进行合并
@@ -118,12 +141,16 @@ def assemble_frame(metric_list, k_day):
     return pd.DataFrame(new_list, index=index)
 
 
-if __name__ == '__main__':
-    pred_model = xgb.xgb_predict
-    produce_result(pred_model)
+def repeat_run(start, end, func):
+    """
+    多次运行取平均值，这里使用范围表示重复运行的范围，[start, end)
+    """
+    for repeat_id in range(start, end):
+        print(f'repeat-id {repeat_id}')
+        produce_result(func, repeat_id)
 
-    # 绘图
-    df = pd.read_csv(f'pred_len_survey/metrics/{pred_model.__name__}.csv', index_col='Column')
-    avg_metric_plot(df, 'MAPE', pred_model.__name__)
-    avg_metric_plot(df, 'PCC', pred_model.__name__)
-    avg_metric_plot(df, 'RMSE', pred_model.__name__)
+
+if __name__ == '__main__':
+
+    pred_model = recurrent.lstm_union_predict
+    avg_box_plot(pred_model, 9)

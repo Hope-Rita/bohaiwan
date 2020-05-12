@@ -49,3 +49,6 @@ def compare(y, pred, col_name, save_path, title_info=None):
     if not os.path.exists(save_path['dir']):
         os.makedirs(save_path['dir'])
     plt.savefig(os.path.join(save_path['dir'], save_path['filename']))
+
+    plt.clf()
+    plt.close('all')

@@ -26,9 +26,7 @@ def predict_one_cols(func, data):
             # Recurrent 模型在训练时打印一下传感器的名字
             print(f'当前列: {column}')
 
-        # 普通模型的数据归一化，对 x_train 和 x_test 分别按列进行归一化
-        # x_train = data_process.col_normalization(x_train)
-        # x_test = data_process.col_normalization(x_test)
+        # x_train 和 x_test 在数据生成阶段就已经按列归一化了，这里对 y 进行归一化
         normal_y = normalization.MinMaxNormal([y_train, y_test])
         y_train = normal_y.transform(y_train)
 

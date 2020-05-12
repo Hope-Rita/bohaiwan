@@ -13,6 +13,7 @@ from utils.metric import RMSELoss
 
 # 加载模型参数
 device = torch.device(global_config.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')
 num_workers, batch_size, epoch_num, learning_rate \
     = global_config.get_config('model-parameters',
                                'recurrent',
