@@ -18,7 +18,7 @@ from utils.config import *
 
 
 # 存放预测结果文件的路径
-res_dir1, res_dir2 = get_config('config.json', 'predict-result', inner_keys=['result1', 'result2'])
+res_dir1, res_dir2 = global_config.get_config('config.json', 'predict-result', inner_keys=['result1', 'result2'])
 
 
 def scheme1(filename, section):
@@ -53,8 +53,8 @@ def predict_one_cols(func, data, filename):
 
 
 if __name__ == '__main__':
-    pred_target = get_config('config.json', 'predict-target')
-    pred_target_filename = get_config('../data/data.json', pred_target, 'server')
+    pred_target = global_config.get_config('config.json', 'predict-target')
+    pred_target_filename = global_config.get_config('../data/data.json', pred_target, 'server')
     # scheme1(pred_target_filename, 'S01')
 
     pred_data = gen_dataset.load_section(pred_target_filename, 'S01')

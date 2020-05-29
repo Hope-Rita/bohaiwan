@@ -4,16 +4,16 @@
     "data-parameters":{
         "pred-len":14,
         "future-days":14,
-        "env-factor-num":3
+        "env-factor-num":0
     },
     "model-parameters":{
         "recurrent":{
-            "lstm-hidden-size":15,
-            "rnn-hidden-size":25,
-            "gru-hidden-size":20,
+            "lstm-hidden-size":30,
+            "rnn-hidden-size":15,
+            "gru-hidden-size":15,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.03,
+            "learning-rate":0.003,
             "epoch-num":300
         },
         "mlp":{

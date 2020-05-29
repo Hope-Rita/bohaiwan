@@ -1,17 +1,14 @@
 import numpy as np
 import pandas as pd
 import utils.load_utils as ld
-from utils.config import get_config
+from utils.config import *
 from utils import data_process
 
 
-config_path = 'config.json'
-weather = get_config('../data/data.json', 'weather', 'server')
-waterline = get_config('../data/data.json', 'waterline', 'server')
-pred_len, future_days, env_factor_num = get_config(config_path,
-                                                   'data-parameters',
-                                                   inner_keys=['pred-len', 'future-days', 'env-factor-num']
-                                                   )
+weather = global_config.get_data_loc('weather')
+waterline = global_config.get_data_loc('waterline')
+pred_len, future_days, env_factor_num = \
+    global_config.get_config('data-parameters', inner_keys=['pred-len', 'future-days', 'env-factor-num'])
 print(f'从{config_path}载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 

@@ -63,5 +63,6 @@ class Config(object):
         return self._data_config_dict[data_name]['local' if local else 'server']
 
 
+# 在这里提供载入配置的 JSON 文件路径
 config_path = '../union_predict/config.json'
 global_config = Config(config_path)

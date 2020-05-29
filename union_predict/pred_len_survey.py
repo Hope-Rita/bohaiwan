@@ -152,5 +152,5 @@ def repeat_run(start, end, func):
 
 if __name__ == '__main__':
 
-    pred_model = recurrent.lstm_union_predict
-    avg_box_plot(pred_model, 9)
+    pred_model = recurrent.rnn_union_predict
+    avg_box_plot(pred_model, 10)
