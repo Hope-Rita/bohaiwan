@@ -5,10 +5,18 @@ from utils.config import *
 from utils import data_process
 
 
+# 加载环境数据的路径
 weather = global_config.get_data_loc('weather')
 waterline = global_config.get_data_loc('waterline')
-pred_len, future_days, env_factor_num = \
+# 加载运行配置
+pred_len, future_days, env_factor_num =\
     global_config.get_config('data-parameters', inner_keys=['pred-len', 'future-days', 'env-factor-num'])
+# 环境变量加载配置
+add_high_tp, add_low_tp, add_waterline = \
+    global_config.get_config('env-factor-load', inner_keys=['high-tp', 'low-tp', 'waterline'])
+# 检查环境因素个数是否一致
+if env_factor_num != add_high_tp + add_low_tp + add_waterline:
+    raise ValueError('env-factor 配置出现矛盾')
 print(f'\n配置文件：{config_path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
@@ -64,11 +72,12 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
             x.append(series)
 
             # 放入外部特征
-            x[-1].extend([
-                weather_frame.loc[pred_date, 'low_tp'],
-                weather_frame.loc[pred_date, 'high_tp'],
-                waterline_frame.loc[pred_date, 'waterline']
-            ])
+            if add_high_tp:
+                x[-1].append(weather_frame.loc[pred_date, 'high_tp'])
+            if add_low_tp:
+                x[-1].append(weather_frame.loc[pred_date, 'low_tp'])
+            if add_waterline:
+                x[-1].append(waterline_frame.loc[pred_date, 'waterline'])
 
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)

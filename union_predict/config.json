@@ -4,20 +4,25 @@
     "data-parameters":{
         "pred-len":14,
         "future-days":14,
-        "env-factor-num":0
+        "env-factor-num":3
+    },
+    "env-factor-load": {
+        "low-tp": true,
+        "high-tp": true,
+        "waterline": true
     },
     "model-parameters":{
         "recurrent":{
             "lstm-hidden-size":30,
             "rnn-hidden-size":15,
-            "gru-hidden-size":15,
+            "gru-hidden-size":25,
             "num-workers":0,
             "batch-size":16,
             "learning-rate":0.003,
             "epoch-num":300
         },
         "mlp":{
-            "hidden-size": [38, 19, 9]
+            "hidden-size": [32, 16, 8]
         }
     },
     "predict-result":{
@@ -31,7 +36,7 @@
         }
     },
     "device":{
-        "cuda":"cuda:3",
+        "cuda":"cuda:0",
         "cpu":"cpu"
     }
 }
