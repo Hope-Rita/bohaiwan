@@ -17,6 +17,7 @@ class Config(object):
         f = open(data_config_path, encoding='utf-8')
         self._data_config_dict = json.load(f)
         f.close()
+        self.run_on_local = self._config_dict['run-on-local']
 
     def modify_config(self, *keys, new_val):
         """
@@ -53,14 +54,13 @@ class Config(object):
         else:
             return tuple([res[inner_key] for inner_key in inner_keys])
 
-    def get_data_loc(self, data_name, local=False):
+    def get_data_loc(self, data_name):
         """
-        获取存放数据的路径
+        获取存放数据的路径, run_on_local 若为 True 则加载本地的文件，否则加载服务器上的
         :param data_name: 数据的名字
-        :param local: 若为 True 则加载本地的文件，否则加载服务器上的
         :return: 文件的绝对路径
         """
-        return self._data_config_dict[data_name]['local' if local else 'server']
+        return self._data_config_dict[data_name]['local' if self.run_on_local else 'server']
 
 
 # 在这里提供载入配置的 JSON 文件路径

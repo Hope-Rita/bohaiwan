@@ -35,6 +35,7 @@
             "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result2"
         }
     },
+    "run-on-local": false,
     "device":{
         "cuda":"cuda:0",
         "cpu":"cpu"
