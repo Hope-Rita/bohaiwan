@@ -32,7 +32,7 @@ class Config(object):
         f = open(data_config_path, encoding='utf-8')
         self.__data_config_dict = json.load(f)
         f.close()
-        self.run_on_local = self.__config_dict['run-on-local']
+        self.__run_on_local = self.__config_dict['run-on-local']
 
     def modify_config(self, *keys, new_val):
         """
@@ -75,7 +75,7 @@ class Config(object):
         :param data_name: 数据的名字
         :return: 文件的绝对路径
         """
-        return self.__data_config_dict[data_name]['local' if self.run_on_local else 'server']
+        return self.__data_config_dict[data_name]['local' if self.__run_on_local else 'server']
 
     @property
     def path(self):

@@ -3,15 +3,15 @@ import numpy as np
 import pandas as pd
 from utils import normalization
 import utils.load_utils as ld
-from utils.config import get_config
+from utils.config import Config
 
 
-data_path = '../data/data.json'
-col_match_path = get_config('config.json', 'col-match', 'server')
-pressure = get_config(data_path, 'pressure', 'server')
-weather = get_config(data_path, 'weather', 'server')
-waterline = get_config(data_path, 'waterline', 'server')
-temperature = get_config(data_path, 'temperature', 'server')
+conf = Config()
+col_match_path = conf.get_data_loc('col-match')
+pressure = conf.get_data_loc('pressure')
+weather = conf.get_data_loc('weather')
+waterline = conf.get_data_loc('waterline')
+temperature = conf.get_data_loc('temperature')
 
 valid_dates = None
 

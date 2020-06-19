@@ -30,5 +30,9 @@
   "pressure": {
       "local": "C:\\study\\WorkSpace\\bohaiwan\\data\\pressure.csv",
       "server": "/home/lwt/bohaiwan/data/pressure.csv"
+  },
+  "col-match": {
+    "local": "C:\\study\\WorkSpace\\bohaiwan\\env_factors\\col_matched.json",
+    "server": "/home/lwt/bohaiwan/env_factors/col_matched.json"
   }
 }

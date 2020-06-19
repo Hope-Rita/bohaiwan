@@ -13,9 +13,5 @@
   "device": {
       "cuda": "cuda:0",
       "cpu": "cpu"
-  },
-  "col-match": {
-      "local": "C:\\study\\WorkSpace\\bohaiwan\\env_factors\\col_matched.json",
-      "server": "/home/lwt/bohaiwan/env_factors/col_matched.json"
   }
 }

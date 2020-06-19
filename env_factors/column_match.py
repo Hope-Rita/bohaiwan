@@ -1,17 +1,16 @@
 import json
 import pandas as pd
-from utils.config import get_config
-from utils.config import *
+from utils.config import Config
+conf = Config('config.json')
 
 
-data_path = '../data/data.json'
-json_path = get_config.get_config('config.json', 'col-match', 'server')
-taseometer = get_config.get_config(data_path, 'taseometer', 'server')
-strainmeter = get_config.get_config(data_path, 'strainneter', 'server')
-pressure = get_config.get_config(data_path, 'pressure', 'server')
-weather = get_config.get_config(data_path, 'weather', 'server')
-waterline = get_config.get_config(data_path, 'waterline', 'server')
-temperature = get_config.get_config(data_path, 'temperature', 'server')
+json_path = conf.get_data_loc('col-match')
+taseometer = conf.get_data_loc('taseometer')
+strainmeter = conf.get_data_loc('strainneter')
+pressure = conf.get_data_loc('pressure')
+weather = conf.get_data_loc('weather')
+waterline = conf.get_data_loc('waterline')
+temperature = conf.get_data_loc('temperature')
 
 
 pressure_frame = pd.read_csv(pressure, parse_dates=True, index_col='date')
