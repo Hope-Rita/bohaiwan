@@ -1,23 +1,24 @@
 import numpy as np
 import pandas as pd
 import utils.load_utils as ld
-from utils.config import *
+from utils.config import Config
 from utils import data_process
 
 
+conf = Config()
 # 加载环境数据的路径
-weather = global_config.get_data_loc('weather')
-waterline = global_config.get_data_loc('waterline')
+weather = conf.get_data_loc('weather')
+waterline = conf.get_data_loc('waterline')
 # 加载运行配置
-pred_len, future_days, env_factor_num =\
-    global_config.get_config('data-parameters', inner_keys=['pred-len', 'future-days', 'env-factor-num'])
+pred_len, future_days, env_factor_num = \
+    conf.get_config('data-parameters', inner_keys=['pred-len', 'future-days', 'env-factor-num'])
 # 环境变量加载配置
 add_high_tp, add_low_tp, add_waterline = \
-    global_config.get_config('env-factor-load', inner_keys=['high-tp', 'low-tp', 'waterline'])
+    conf.get_config('env-factor-load', inner_keys=['high-tp', 'low-tp', 'waterline'])
 # 检查环境因素个数是否一致
 if env_factor_num != add_high_tp + add_low_tp + add_waterline:
     raise ValueError('env-factor 配置出现矛盾')
-print(f'\n配置文件：{config_path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
+print(f'\n配置文件：{conf.path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
 def gen_data(filename, col_id, add_date=False):

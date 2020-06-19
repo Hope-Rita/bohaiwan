@@ -13,7 +13,7 @@ def split_date(frame):
             now = list()
         else:
             now.append(day)
-    else:
+    else:  # 最后剩的没有断的那一条连续日期
         if len(now) > 0:
             res.append(now)
 

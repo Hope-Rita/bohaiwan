@@ -3,7 +3,8 @@ import torch
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import trange
-from utils.config import *
+
+from utils.config import Config
 from baseline.recurrent_reg import RNNReg, GRUReg, LSTMReg
 from baseline.recurrent_fusion import RNNFusion, GRUFusion, LSTMFusion
 from baseline.recurrent_section_fusion import LSTMSectionFusion
@@ -11,20 +12,21 @@ from utils import normalization
 from utils.metric import RMSELoss
 
 
+conf = Config()
 # 加载模型参数
-device = torch.device(global_config.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
+device = torch.device(conf.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
 # device = torch.device('cpu')
 num_workers, batch_size, epoch_num, learning_rate \
-    = global_config.get_config('model-parameters',
+            = conf.get_config('model-parameters',
                                'recurrent',
                                inner_keys=['num-workers', 'batch-size', 'epoch-num', 'learning-rate']
                                )
-rnn_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
-gru_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
-lstm_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
+rnn_hidden_size = conf.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
+gru_hidden_size = conf.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
+lstm_hidden_size = conf.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
 
 # 加载数据参数
-pred_len, env_factor_num = global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
+pred_len, env_factor_num = conf.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 
 
 def union_predict(model, x_train, y_train, x_test):

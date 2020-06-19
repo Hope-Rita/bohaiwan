@@ -14,11 +14,11 @@ from baseline import xgb
 from env_factors import gen_dataset
 from utils import data_process
 from utils import metric
-from utils.config import get_config
+from utils.config import *
 
 
 # 存放预测结果的文件路径
-result_dir, result2_dir = get_config('config.json', 'predict-result', inner_keys=['result', 'result2'])
+result_dir, result2_dir = global_config.get_config('predict-result', inner_keys=['result', 'result2'])
 
 
 def scheme3(filename):
@@ -120,6 +120,6 @@ def predict_one_cols(func, data, filename):
 
 
 if __name__ == '__main__':
-    pred_target = get_config('config.json', 'predict-target')
+    pred_target = global_config.get_config('predict-target')
     pred_target_filename = get_config('../data/data.json', pred_target, 'server')
     scheme3(pred_target_filename)

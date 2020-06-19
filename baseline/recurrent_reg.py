@@ -1,14 +1,15 @@
 from torch import nn
-from utils.config import *
+from utils.config import Config
 
 
+conf = Config()
 # 加载模型参数
-rnn_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
-gru_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
-lstm_hidden_size = global_config.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
+rnn_hidden_size = conf.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
+gru_hidden_size = conf.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
+lstm_hidden_size = conf.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
 
 # 加载数据参数
-pred_len, env_factor_num = global_config.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
+pred_len, env_factor_num = conf.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
 
 
 class RegBase(nn.Module):

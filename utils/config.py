@@ -1,23 +1,38 @@
 import json
 
 
+def singleton(cls):
+
+    _instance = {}
+
+    def _singleton(*args, **kwargs):
+        if cls not in _instance:
+            _instance[cls] = cls(*args, **kwargs)
+        return _instance[cls]
+
+    return _singleton
+
+
+@singleton
 class Config(object):
 
-    def __init__(self, runtime_config_path, data_config_path='../data/data.json'):
+    def __init__(self, runtime_config_path=None, data_config_path='../data/data.json'):
         """
         初始化全局的运行配置和数据存储配置
         :param runtime_config_path: 存放运行配置的路径
         :param data_config_path: 存放数据存储配置的路径
         """
+        self.__path = runtime_config_path
+        self.__data_path = data_config_path
         # 加载程序运行配置
         f = open(runtime_config_path, encoding='utf-8')
-        self._config_dict = json.load(f)
+        self.__config_dict = json.load(f)
         f.close()
         # 加载数据存储配置
         f = open(data_config_path, encoding='utf-8')
-        self._data_config_dict = json.load(f)
+        self.__data_config_dict = json.load(f)
         f.close()
-        self.run_on_local = self._config_dict['run-on-local']
+        self.run_on_local = self.__config_dict['run-on-local']
 
     def modify_config(self, *keys, new_val):
         """
@@ -26,7 +41,7 @@ class Config(object):
         :param new_val: 新赋的值
         """
         # 逐层取值
-        d = self._config_dict
+        d = self.__config_dict
         for key in keys[:-1]:
             d = d[key]
 
@@ -45,7 +60,7 @@ class Config(object):
             raise TypeError('inner_keys 应为一个列表')
 
         # 逐层取值
-        res = self._config_dict
+        res = self.__config_dict
         for key in keys:
             res = res[key]
 
@@ -60,9 +75,12 @@ class Config(object):
         :param data_name: 数据的名字
         :return: 文件的绝对路径
         """
-        return self._data_config_dict[data_name]['local' if self.run_on_local else 'server']
+        return self.__data_config_dict[data_name]['local' if self.run_on_local else 'server']
 
+    @property
+    def path(self):
+        return self.__path
 
-# 在这里提供载入配置的 JSON 文件路径
-config_path = '../union_predict/config.json'
-global_config = Config(config_path)
+    @property
+    def data_path(self):
+        return self.__data_path
