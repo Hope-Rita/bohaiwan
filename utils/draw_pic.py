@@ -35,7 +35,7 @@ def metric_for_cols():
     plt.show()
 
 
-def compare(y, pred, col_name, save_path, title_info=None):
+def compare(y, pred, save_path, title_info=None):
     plt.figure(figsize=(15, 8))
     plt.plot(pred, color='green', label='predict')
     plt.plot(y, label='truth')

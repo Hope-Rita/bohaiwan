@@ -121,7 +121,6 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
     if is_draw_pic:
         draw_pic.compare(y=np.concatenate((y_train, y_test)),
                          pred=np.concatenate((y_train, pred)),
-                         col_name=col,
                          save_path={'dir': f'onecol_pred_result/{func.__name__}/pics', 'filename': f'{col}.jpg'},
                          title_info=(func.__name__ + ' ' + col)
                          )
@@ -136,8 +135,8 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
-    analysis_all_cols(pred_target_filename, rf.rf_predict)
-    # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
+    # analysis_all_cols(pred_target_filename, knn.knn_predict)
+    predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
     # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     # predict_one_cols(rf.rf_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)
