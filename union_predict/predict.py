@@ -18,6 +18,8 @@ from baseline import mlp
 from baseline import recurrent
 from baseline import svr
 from baseline import xgb
+from baseline import rf
+from baseline import knn
 from union_predict import gen_dataset
 from utils import data_process
 from utils import draw_pic
@@ -92,6 +94,11 @@ def predict_all_data(func, filename):
 
 
 def analysis_all_cols(filename, func):
+    """
+    对每一列传感器进行分析，得到较为详细的数据，并绘制图像
+    :param filename: 存放数据的文件
+    :param func: 使用的模型
+    """
     cols = gen_dataset.get_all_col_name(filename)
     for col in cols:
         predict_one_col(filename, col, func)
@@ -129,8 +136,8 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
-    # analysis_all_cols(pred_target_filename, lr.lr_predict)
+    analysis_all_cols(pred_target_filename, rf.rf_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.lstm_union_predict, is_draw_pic=False)
-    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
+    # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    # predict_one_cols(rf.rf_predict, target_data, pred_target_filename)
     # scheme2(pred_target_filename)

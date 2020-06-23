@@ -6,8 +6,7 @@
   },
   "predict-target": "taseometer",
   "predict-result": {
-      "result": "/home/lwt/bohaiwan/env_factors/result",
-      "result2": "/home/lwt/bohaiwan/env_factors/result2"
+      "result": "/home/lwt/bohaiwan/env_factors/result"
   },
   "run-on-local": false,
   "device": {
