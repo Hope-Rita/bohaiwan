@@ -18,7 +18,7 @@ from utils.config import *
 
 
 # 存放预测结果文件的路径
-res_dir1, res_dir2 = global_config.get_config('config.json', 'predict-result', inner_keys=['result1', 'result2'])
+res_dir1, res_dir2 = global_config.get_config('config.json', 'predict-result', inner_keys=['result1', 'pred_result'])
 
 
 def scheme1(filename, section):

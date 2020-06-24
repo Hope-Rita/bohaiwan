@@ -112,16 +112,6 @@ def load_cols(filename, random_pick=False):
     return ld.load_cols(filename, cols=frame.columns, load_func=gen_data, random_pick=random_pick)
 
 
-def load_every_col(filename):
-    """
-    载入训练集和测试集，训练集是整体的，测试集是分列的
-    :param filename: 存放数据的 csv 文件路径
-    :return: x_train, y_train 是 numpy 数组, test_data 是 dict((x_test, y_test))
-    """
-    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_every_col(filename, cols=frame.columns, load_func=gen_data, random_pick=True)
-
-
 def load_all(filename):
     """
     载入所有列，并划分训练集和测试集

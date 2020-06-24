@@ -26,14 +26,8 @@
         }
     },
     "predict-result":{
-        "result1":{
-            "server":"/home/lwt/bohaiwan/union_predict/result1",
-            "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result1"
-        },
-        "result2":{
-            "server":"/home/lwt/bohaiwan/union_predict/result2",
-            "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result2"
-        }
+        "server":"/home/lwt/bohaiwan/union_predict/pred_result",
+        "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\pred_result"
     },
     "run-on-local": false,
     "device":{

@@ -1,10 +1,3 @@
-"""
-采取两种方案来预测
-1）所有的数据一起训练，分列进行测试
-2）分列进行训练和测试
-"""
-
-
 import numpy as np
 import platform
 
@@ -26,36 +19,12 @@ from utils import draw_pic
 from utils import metric
 
 
-res_dir1, res_dir2 = None, None
+pred_res_dir = None
 
 
-def predict_every_col(filename):
-    # 方案 1
-    x_train, y_train, test_data = gen_dataset.load_every_col(filename)
-
-    for func in [lr, svr, xgb, mlp]:
-        # 每个模型都训练一遍
-        print('模型：', func.__name__)
-
-        result_list = []
-        model = func.model_fit(x_train, y_train)
-
-        for key in test_data:
-            pred = func.predict(model, x_test=test_data[key][0])
-
-            d = {'Column': key}
-            metric_dict = metric.all_metric(y=test_data[key][1], pred=pred.reshape(-1))
-            d.update(metric_dict)
-            result_list.append(d)
-
-        # 写到 CSV 文件里
-        csv_name = func.__name__.split('.')[-1] + f'_{gen_dataset.future_days}day' + '_' + filename.split('/')[-1]
-        data_process.dump_csv(res_dir1, csv_name, result_list, average_func=data_process.avg)
-
-
-def scheme2(filename):
+def classical_models(filename):
     """
-    方案2：分列进行训练和测试
+    对四个经典的模型，分列进行训练和测试
     :param filename: 存放数据的 CSV 文件路径
     """
 
@@ -82,7 +51,7 @@ def predict_one_cols(func, data, filename):
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
     csv_name += filename.split('\\')[-1] if platform.system() is 'Windows' else filename.split('/')[-1]
 
-    data_process.dump_csv(res_dir2, csv_name, cols_metrics, average_func=data_process.avg)
+    data_process.dump_csv(pred_res_dir, csv_name, cols_metrics, average_func=data_process.avg)
 
 
 def predict_all_data(func, filename):
@@ -128,15 +97,14 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
 
 if __name__ == '__main__':
     # 存放预测结果文件的路径
-    res_dir1 = conf.get_config('predict-result', 'result1', 'server')
-    res_dir2 = conf.get_config('predict-result', 'result2', 'server')
+    pred_res_dir = conf.get_config('predict-result', 'server')
 
     pred_target = conf.get_config('predict-target')
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
     # analysis_all_cols(pred_target_filename, knn.knn_predict)
-    predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
+    # predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
     # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     # predict_one_cols(rf.rf_predict, target_data, pred_target_filename)
-    # scheme2(pred_target_filename)
+    classical_models(pred_target_filename)
