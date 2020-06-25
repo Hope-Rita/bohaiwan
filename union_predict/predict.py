@@ -74,16 +74,17 @@ def analysis_all_cols(filename, func):
         predict_one_col(filename, col, func)
 
 
-def cross_validation(filename, func):
+def cross_validation(filename, func, k=10):
     """
     对每一列传感器进行多折交叉验证，输出各列的值，并绘制图像
     :param filename: 存放数据的文件
     :param func: 使用的预测模型
+    :param k: 折数
     """
     cols = gen_dataset.get_all_col_name(filename)
     col_metrics = []
     for col in cols:
-        col_metrics.append(one_col_cross_validation(filename, col, func))
+        col_metrics.append(one_col_cross_validation(filename, col, func, k))
 
     # 写入 CSV 文件。系统不同，处理方式不一样
     csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
-    cross_validation(pred_target_filename, recurrent.lstm_union_predict)
+    cross_validation(pred_target_filename, recurrent.rnn_union_predict, k=4)
     # one_col_cross_validation(pred_target_filename, pred_col, lr.lr_predict)
     # analysis_all_cols(pred_target_filename, knn.knn_predict)
     # predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
