@@ -99,14 +99,15 @@ def load_cols(filename, cols, load_func, random_pick=False):
     return data
 
 
-def load_one_col(filename, col, load_func, random_pick=False, add_date=False):
+def load_one_col(filename, col, load_func, random_pick=False, add_date=False, split=True):
     """
-    加载指定的列，并划分训练集和测试集
+    根据列号，加载指定的列
     :param filename: 存放数据的 csv 文件
     :param col: 要加载的列
     :param load_func: 加载数据使用的函数
     :param random_pick: 是否随机选取
     :param add_date: 是否返回日期序列
+    :param split: 是否划分训练集和测试集
     :return: 四个数据集
     """
     if not callable(load_func):
@@ -114,13 +115,18 @@ def load_one_col(filename, col, load_func, random_pick=False, add_date=False):
 
     print(f'开始从{filename}载入数据')
     # 加载数据集
-    load_data = load_func(filename, col, add_date)
-    # 划分训练集和测试集
-    data = dataset_split(load_data[0], load_data[1], random_pick=random_pick)
+    loaded_data = load_func(filename, col, add_date)
+
+    if split:
+        # 划分训练集和测试集
+        data = dataset_split(loaded_data[0], loaded_data[1], random_pick=random_pick)
+    else:
+        # 不划分
+        data = (loaded_data[0], loaded_data[1])
 
     print('已生成数据集\n')
     if add_date:
-        return data + (load_data[2], )  # 把数据集和日期放在一块返回
+        return data + (loaded_data[2], )  # 把数据集和日期放在一块返回
     else:
         return data
 

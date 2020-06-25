@@ -89,16 +89,26 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
         return data_process.col_normalization(np.array(x)), np.array(y)
 
 
-def load_one_col(filname, col, add_date=False, random_pick=False):
+def load_one_col(filename, col, add_date=False, random_pick=False):
     """
     载入给定列的数据
-    :param filname: 存放数据的 CSV 文件
+    :param filename: 存放数据的 CSV 文件
     :param col: 指定的列号
     :param add_date: 是否增加日期序列
     :param random_pick: 在划分数据集的时候是否随机选取
     :return: 四个数据集
     """
-    return ld.load_one_col(filname, col, load_func=gen_data, add_date=add_date, random_pick=random_pick)
+    return ld.load_one_col(filename, col, load_func=gen_data, add_date=add_date, random_pick=random_pick)
+
+
+def load_one_col_not_split(filename, col, add_date=False):
+    """
+    分别导入各列数据，不进行划分训练集和测试集
+    :param filename: 存放数据的 CSV 文件
+    :param col: 指定的列号
+    :param add_date: 是否增加日期序列
+    """
+    return ld.load_one_col(filename, col, load_func=gen_data, add_date=add_date, split=False)
 
 
 def load_cols(filename, random_pick=False):

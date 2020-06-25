@@ -1,5 +1,6 @@
 import numpy as np
 import platform
+from sklearn.model_selection import KFold
 
 from utils.config import Config
 config_path = '../union_predict/config.json'
@@ -73,6 +74,24 @@ def analysis_all_cols(filename, func):
         predict_one_col(filename, col, func)
 
 
+def cross_validation(filename, func):
+    """
+    对每一列传感器进行多折交叉验证，输出各列的值，并绘制图像
+    :param filename: 存放数据的文件
+    :param func: 使用的预测模型
+    """
+    cols = gen_dataset.get_all_col_name(filename)
+    col_metrics = []
+    for col in cols:
+        col_metrics.append(one_col_cross_validation(filename, col, func))
+
+    # 写入 CSV 文件。系统不同，处理方式不一样
+    csv_name = func.__name__.split('_')[0] + f'_{gen_dataset.future_days}day' + '_'
+    csv_name += filename.split('\\')[-1] if platform.system() is 'Windows' else filename.split('/')[-1]
+
+    data_process.dump_csv(f'kflod_valid/{func.__name__}', csv_name, col_metrics, average_func=data_process.avg)
+
+
 def predict_one_col(filename, col, func, is_draw_pic=True):
     """
     使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检查测试
@@ -83,7 +102,7 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
     """
     x_train, y_train, x_test, y_test, dates = gen_dataset.load_one_col(filename, col, add_date=True)
     pred = func(x_train, y_train, x_test)
-    print(metric.all_metric(y_test, pred))
+    print(col + ':', metric.all_metric(y_test, pred))
     data_process.dump_pred_result(f'onecol_pred_result/{func.__name__}/metrics', f'{col}.csv', y_test, pred, dates)
 
     # 画个比较图
@@ -95,6 +114,41 @@ def predict_one_col(filename, col, func, is_draw_pic=True):
                          )
 
 
+def one_col_cross_validation(filename, col, func, k=10, is_draw_pic=True):
+    """
+    对某一列传感器的数据进行多折交叉验证
+    :param filename: 存放数据的文件名
+    :param col: 当前列号
+    :param func: 使用的预测模型
+    :param k: 折数
+    :param is_draw_pic: 是否绘制图像
+    :return: 这列的预测指标
+    """
+    x, y, date = gen_dataset.load_one_col_not_split(filename, col, add_date=True)
+    pred = np.zeros(y.shape)
+    kf = KFold(n_splits=k, shuffle=False)
+
+    print('当前列：', col)
+    for i, (train_index, test_index) in enumerate(kf.split(x), 1):
+        print(f'正在训练第{i}折')
+        x_train, y_train, x_test = x[train_index], y[train_index], x[test_index]
+        pred_temp = func(x_train, y_train, x_test)  # 某一折的预测结果
+        pred[test_index] = pred_temp
+
+    col_metric = metric.all_metric(y, pred)
+    print(col + ':', col_metric)
+    data_process.dump_pred_result(f'kflod_valid/{func.__name__}/vals', f'{col}.csv', y, pred, date)
+
+    if is_draw_pic:
+        draw_pic.compare(y,
+                         pred,
+                         save_path={'dir': f'kflod_valid/{func.__name__}/pics', 'filename': f'{col}.jpg'},
+                         title_info=(func.__name__ + ' ' + col)
+                         )
+
+    return col_metric
+
+
 if __name__ == '__main__':
     # 存放预测结果文件的路径
     pred_res_dir = conf.get_config('predict-result', 'server')
@@ -103,8 +157,10 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
+    cross_validation(pred_target_filename, recurrent.lstm_union_predict)
+    # one_col_cross_validation(pred_target_filename, pred_col, lr.lr_predict)
     # analysis_all_cols(pred_target_filename, knn.knn_predict)
     # predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
     # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     # predict_one_cols(rf.rf_predict, target_data, pred_target_filename)
-    classical_models(pred_target_filename)
+    # classical_models(pred_target_filename)
