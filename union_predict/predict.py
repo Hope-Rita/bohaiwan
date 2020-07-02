@@ -158,10 +158,10 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
     pred_col = conf.get_config('predict-col')
 
-    cross_validation(pred_target_filename, recurrent.rnn_union_predict, k=4)
+    # cross_validation(pred_target_filename, recurrent.rnn_union_predict, k=4)
     # one_col_cross_validation(pred_target_filename, pred_col, lr.lr_predict)
     # analysis_all_cols(pred_target_filename, knn.knn_predict)
     # predict_one_col(pred_target_filename, pred_col, knn.knn_predict, is_draw_pic=True)
-    # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    # predict_one_cols(rf.rf_predict, target_data, pred_target_filename)
+    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
     # classical_models(pred_target_filename)

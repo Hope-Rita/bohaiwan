@@ -48,10 +48,10 @@ def gen_data(filename, col_id, add_date=False):
 
         tmp = list()
         tmp.append(get_matched_val(temperature_frame, matched_cols, col_id, 'temperature', date))
-        tmp.append(weather_frame.loc[date, 'high_tp'])
-        tmp.append(weather_frame.loc[date, 'low_tp'])
+        # tmp.append(weather_frame.loc[date, 'high_tp'])
+        # tmp.append(weather_frame.loc[date, 'low_tp'])
         tmp.append(get_matched_val(pressure_frame, matched_cols, col_id, 'pressure', date))
-        tmp.append(waterline_frame.loc[date, 'waterline'])
+        # tmp.append(waterline_frame.loc[date, 'waterline'])
         x.append(tmp)
 
     if add_date:
@@ -68,16 +68,6 @@ def load_all(filename):
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
     return ld.load_all(filename, cols=get_valid_cols(frame.columns[1:]), load_func=gen_data, random_pick=True)
-
-
-def load_every_col(filename):
-    """
-    载入训练集和测试集(随机划分)，训练集是整体的，测试集是分列的
-    :param filename: 存放数据的 csv 文件路径
-    :return: x_train, y_train 是 numpy 数组, test_data 是 dict((x_test, y_test))
-    """
-    frame = pd.read_csv(filename, parse_dates=True, index_col='date')
-    return ld.load_every_col(filename, cols=get_valid_cols(frame.columns[1:]), load_func=gen_data, random_pick=True)
 
 
 def load_cols(filename):
@@ -100,6 +90,16 @@ def load_one_col(filename, col, add_date=False):
 
     train_size = int(0.7 * len(x))
     return x[:train_size], y[:train_size], x[train_size:], y[train_size:], normal_y
+
+
+def load_one_col_not_split(filename, col, add_date=False):
+    """
+    分别导入各列数据，不进行划分训练集和测试集
+    :param filename: 存放数据的 CSV 文件
+    :param col: 指定的列号
+    :param add_date: 是否增加日期序列
+    """
+    return ld.load_one_col(filename, col, load_func=gen_data, add_date=add_date, split=False)
 
 
 def feature_normalization(x, y):

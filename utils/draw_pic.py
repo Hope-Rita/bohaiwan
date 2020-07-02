@@ -52,3 +52,19 @@ def compare(y, pred, save_path, title_info=None):
 
     plt.clf()
     plt.close('all')
+
+
+def draw_by_label(pic_path, pic_name, **items):
+    plt.figure()
+    for label in items:
+        plt.plot(items[label], label=label)
+
+    plt.title(pic_name)
+    plt.legend()
+
+    if not os.path.exists(pic_path):
+        os.makedirs(pic_path)
+    plt.savefig(os.path.join(pic_path, pic_name))
+
+    plt.clf()
+    plt.close('all')
