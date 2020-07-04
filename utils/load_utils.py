@@ -131,7 +131,7 @@ def load_one_col(filename, col, load_func, random_pick=False, add_date=False, sp
         return data
 
 
-def dataset_split(x, y, rate=0.7, random_pick=False, return_numpy=True):
+def dataset_split(x, y, rate=0.8, random_pick=False, return_numpy=True):
     """
     将数据集分成训练集和测试集
     :param x: 样本集
@@ -159,7 +159,7 @@ def dataset_split(x, y, rate=0.7, random_pick=False, return_numpy=True):
         return x_train, y_train, x_test, y_test
 
 
-def random_split(x, y, rate=0.7):
+def random_split(x, y, rate=0.8):
     """
     随机划分训练集和测试集
     :param x: 样本集
