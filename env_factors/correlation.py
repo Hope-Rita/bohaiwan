@@ -15,4 +15,5 @@ cols = gen_dataset.get_valid_cols(frame.columns)
 for col in cols:
     print(col)
     x, y = gen_dataset.load_one_col_not_split(pred_target_filename, col)
-    draw_pic.draw_by_label('corr_pics', col, temperature=x[:, 0], pressure=x[:, 1], stress=y)
+    draw_pic.draw_by_label('corr_pics', col, temperature=x[:, 0], pressure=x[:, 1], stress=y, high_tp=x[:, 2],
+                           low_tp=x[:, 3], waterline=x[:, 4])

@@ -1,6 +1,45 @@
+import numpy as np
+from sklearn.model_selection import KFold
+
 from utils import metric
 from utils import data_process
 from utils import normalization
+from utils import draw_pic
+
+
+def one_col_cross_validation(data, date, func, k=10, is_draw_pic=True, csv_loc=None, pic_info=None):
+    """
+    对某一列传感器的数据进行多折交叉验证
+    :param data: 用于训练和预测的数据集，可以分成 x 和 y
+    :param date: 整个数据集的预测日期，和 y 一一对应
+    :param func: 使用的预测模型
+    :param k: 折数
+    :param is_draw_pic: 是否绘制图像
+    :param csv_loc: 存放 csv 文件的路径，dict 类型，包括文件夹名字和文件名字
+    :param pic_info: 存放图像的相关信息，dict 类型
+    :return: 这列的预测指标
+    """
+    x, y = data
+    pred = np.zeros(y.shape)
+    kf = KFold(n_splits=k, shuffle=False)
+
+    for i, (train_index, test_index) in enumerate(kf.split(x), 1):
+        print(f'正在训练第{i}折')
+        x_train, y_train, x_test = x[train_index], y[train_index], x[test_index]
+        pred_temp = func(x_train, y_train, x_test)  # 某一折的预测结果
+        pred[test_index] = pred_temp
+
+    col_metric = metric.all_metric(y, pred)
+    data_process.dump_pred_result(csv_loc['dir'], csv_loc['filename'], y, pred, date)
+
+    if is_draw_pic:
+        draw_pic.compare(y,
+                         pred,
+                         save_path={'dir': pic_info['dir'], 'filename': pic_info['filename']},
+                         title_info=pic_info['title']
+                         )
+
+    return col_metric
 
 
 def predict_one_cols(func, data):
