@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+
+from utils.config import Config
+config_path = '../union_predict/pred_len_survey.json'
+conf = Config(config_path)
+
+
 import utils.pred_utils as pu
 from utils.config import *
 from baseline import lr
@@ -41,7 +47,7 @@ def k_day_predict(pred_func, k):
     :return: 模型产生的指标，类型为 DataFrame
     """
     # 修改 config
-    global_config.modify_config('data-parameters', 'pred-len', new_val=k)
+    conf.modify_config('data-parameters', 'pred-len', new_val=k)
 
     # 重新 import 更新 pred-len 参数
     reload(gen_dataset)
@@ -49,8 +55,8 @@ def k_day_predict(pred_func, k):
 
     print('当前的 pred-len 为', gen_dataset.pred_len)
     # 载入数据
-    pred_target = global_config.get_config('predict-target')
-    pred_target_filename = global_config.get_data_loc(pred_target)
+    pred_target = conf.get_config('predict-target')
+    pred_target_filename = conf.get_data_loc(pred_target)
     data = gen_dataset.load_cols(pred_target_filename)
 
     # 测试模型, 返回结果
@@ -153,4 +159,5 @@ def repeat_run(start, end, func):
 if __name__ == '__main__':
 
     pred_model = recurrent.rnn_union_predict
-    avg_box_plot(pred_model, 10)
+    repeat_run(1, 11, pred_model)
+    # avg_box_plot(pred_model, 10)

@@ -5,6 +5,11 @@
         "future-days":14,
         "env-factor-num":3
     },
+    "env-factor-load": {
+        "low-tp": true,
+        "high-tp": true,
+        "waterline": true
+    },
     "model-parameters":{
         "recurrent":{
             "lstm-hidden-size":5,
@@ -22,7 +27,7 @@
             ]
         }
     },
-    "run_on_local": false,
+    "run-on-local": false,
     "device":{
         "cuda":"cuda:3",
         "cpu":"cpu"
