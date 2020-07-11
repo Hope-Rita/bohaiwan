@@ -19,22 +19,6 @@ def all_predict(y_dict):
     plt.show()
 
 
-def metric_for_cols():
-    result1_dir = '/home/lwt/bohaiwan/union_predict/result1'
-    result1_dir = 'C:\\study\\WorkSpace\\bohaiwan\\union_predict\\result1'
-
-    file_list = os.listdir(result1_dir)
-    valid_files = [f for f in file_list if '7day_s' in f]
-
-    for f in valid_files:
-        frame = pd.read_csv(result1_dir + '\\' + f)
-        label = f.split('_')[0].split('.')[1]
-        plt.plot(frame.loc[:, 'MAE'].to_numpy(), label=label)
-
-    plt.legend()
-    plt.show()
-
-
 def compare(y, pred, save_path, title_info=None):
     plt.figure(figsize=(15, 8))
     plt.plot(pred, color='green', label='predict')
