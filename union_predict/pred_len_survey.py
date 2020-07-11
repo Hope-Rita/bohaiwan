@@ -92,22 +92,29 @@ def avg_metric_plot(frame, keyword, model_ame):
     plt.savefig(f'pred_len_survey/pics/{model_ame}_{keyword}.png')
 
 
-def avg_box_plot(func, repeat_len):
+def avg_box_plot(func, repeat_num):
+    """
+    根据多次重复实验的结果绘制箱线图
+    :param func: 使用的预测模型
+    :param repeat_num: 重复的次数
+    """
 
     def draw_box(keyword):
         key_cols = [col for col in avg_frame.columns if keyword in col]
         key_frame = avg_frame[key_cols]
-        plt.boxplot(key_frame.to_numpy(), labels=[int(col[:col.index('d')]) for col in key_cols])
+        plt.boxplot(key_frame.to_numpy(), labels=[col[:col.index('d')] for col in key_cols])
         plt.title(f'{func.__name__}_{keyword}')
         plt.show()
 
+    # 对每一次重复实验，取各列的平均值
     avg_list = []
-    for i in range(1, repeat_len + 1):
+    for i in range(1, repeat_num + 1):
         filename = f'pred_len_survey/metrics/{func.__name__}_repeat{i}.csv'
         df = pd.read_csv(filename, index_col='Column')
         avg_list.append(df.mean(axis=0))
-
+    # 压缩成一个 DataFrame，每行代表一次重复实验
     avg_frame = pd.DataFrame(avg_list)
+
     draw_box('RMSE')
     draw_box('PCC')
     draw_box('MAPE')
@@ -159,5 +166,5 @@ def repeat_run(start, end, func):
 if __name__ == '__main__':
 
     pred_model = recurrent.rnn_union_predict
-    repeat_run(1, 11, pred_model)
-    # avg_box_plot(pred_model, 10)
+    # repeat_run(20, 21, pred_model)
+    avg_box_plot(pred_model, 20)
