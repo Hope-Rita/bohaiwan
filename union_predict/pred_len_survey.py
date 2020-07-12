@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 
 from utils.config import Config
 config_path = '../union_predict/pred_len_survey.json'
@@ -120,6 +121,39 @@ def avg_box_plot(func, repeat_num):
     draw_box('MAPE')
 
 
+def avg_col_trend(func, repeat_num):
+    """
+    进行多次重复实验，并绘制每个传感器预测效果随着 pred_len 变化的平均趋势图
+    :param func: 使用的预测模型
+    :param repeat_num: 重复实验的次数
+    """
+    def draw_plot(series, name, keyword):
+        key_series = series[[col for col in series.index if keyword in col]]
+        plt.plot([idx[:idx.index('d')] for idx in key_series.index], key_series.to_numpy(), marker='o')
+        plt.title(f'{name}_{keyword}')
+        plt.savefig(os.path.join(f'pred_len_survey/col_trend/{func.__name__}', f'{name}_{keyword}'))
+        plt.clf()
+
+    # 遍历所有的实验记录，把同个传感器的记录放到一起
+    sensor_series = {}
+    for i in range(1, repeat_num + 1):
+        filename = f'pred_len_survey/metrics/{func.__name__}_repeat{i}.csv'
+        df = pd.read_csv(filename, index_col='Column')
+
+        for sensor_name, row in df.iterrows():
+            if sensor_name not in sensor_series:
+                sensor_series[sensor_name] = []
+            sensor_series[sensor_name].append(row)
+
+    # 对每个传感器的记录求均值，并进行绘图
+    for sensor_name in sensor_series:
+        sensor_frame = pd.DataFrame(sensor_series[sensor_name])
+        sensor_avg = sensor_frame.mean(axis=0)
+
+        draw_plot(sensor_avg, sensor_name, 'RMSE')
+        draw_plot(sensor_avg, sensor_name, 'PCC')
+
+
 def merge_result(frame_list):
     """
     在 DataFrame 的层面进行合并
@@ -167,4 +201,5 @@ if __name__ == '__main__':
 
     pred_model = recurrent.rnn_union_predict
     # repeat_run(20, 21, pred_model)
-    avg_box_plot(pred_model, 20)
+    # avg_box_plot(pred_model, 20)
+    avg_col_trend(pred_model, 20)
