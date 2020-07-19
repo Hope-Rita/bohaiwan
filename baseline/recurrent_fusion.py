@@ -38,6 +38,9 @@ class FusionBase(nn.Module):
         res = res.view(-1)
         return res
 
+    def name(self):
+        return type(self).__name__
+
 
 class RNNFusion(FusionBase):
 

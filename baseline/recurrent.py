@@ -13,29 +13,44 @@ from utils.metric import RMSELoss
 
 
 conf = Config()
-# 加载模型参数
-device = torch.device(conf.get_config('device', 'cuda') if torch.cuda.is_available() else 'cpu')
-# device = torch.device('cpu')
-num_workers, batch_size, epoch_num, learning_rate \
+
+# 加载模型相关参数
+num_workers, batch_size, epoch_num, learning_rate, save_model, load_model \
             = conf.get_config('model-parameters',
                                'recurrent',
-                               inner_keys=['num-workers', 'batch-size', 'epoch-num', 'learning-rate']
+                               inner_keys=['num-workers',
+                                           'batch-size',
+                                           'epoch-num',
+                                           'learning-rate',
+                                           'save-model',
+                                           'load-model'
+                                           ]
                                )
 rnn_hidden_size = conf.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
 gru_hidden_size = conf.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
 lstm_hidden_size = conf.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
-
+# 选定运行的设备
+if torch.cuda.is_available() and conf.get_config('device', 'use-gpu'):
+    device = torch.device(conf.get_config('device', 'cuda'))
+else:
+    device = torch.device('cpu')
 # 加载数据参数
 pred_len, env_factor_num = conf.get_config('data-parameters', inner_keys=['pred-len', 'env-factor-num'])
+# 存放模型参数的路径
+para_save_path = conf.get_config('model-paras', 'local' if conf.get_config('run-on-local') else 'server')
 
 
 def union_predict(model, x_train, y_train, x_test):
     # 加载数据
-    # data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test, normalize=True)
     data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
 
-    # 训练模型
-    model = train_model(model, data_loader)
+    if load_model:  # 加载已训练好的模型
+        col = conf.get_config('predict-col')
+        path = f'{para_save_path}/{col}_{model.name()}.pkl'
+        model.load_state_dict(torch.load(path))
+        print(f'从{path}处加载模型参数')
+    else:  # 训练模型
+        model = train_model(model, data_loader)
 
     # 将输出的结果进行处理并返回
     pred = model(x_test)
@@ -70,7 +85,6 @@ def lstm_predict(x_train, y_train, x_test):
     # 输入的数据格式为 numpy 数组
     data_loader, x_test, normal = get_dataloader(x_train, y_train, x_test)
 
-    # 训练模型
     model = LSTMReg(x_train.shape[-1]).to(device)
     model = train_model(model, data_loader)
 
@@ -81,6 +95,7 @@ def lstm_predict(x_train, y_train, x_test):
 
 
 def train_model(model, data_loader):
+
     rmse = RMSELoss()
     opt = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=2, threshold=1e-3, min_lr=1e-6)
@@ -114,6 +129,12 @@ def train_model(model, data_loader):
             t.set_postfix(min_loss=min_loss, min_epoch=min_epoch)
 
             scheduler.step(loss)  # 更新学习率
+
+    if save_model:  # 保存模型
+        col = conf.get_config('predict-col')
+        path = f'{para_save_path}/{col}_{model.name()}.pkl'
+        torch.save(model.state_dict(), path)
+        print(f'模型参数已存储到{path}')
 
     return model
 
