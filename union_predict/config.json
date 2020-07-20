@@ -24,8 +24,8 @@
             "batch-size":16,
             "learning-rate":0.01,
             "epoch-num":300,
-            "load-model": true,
-            "save-model": false
+            "load-model": false,
+            "save-model": true
         },
         "mlp":{
             "hidden-size": [32, 16, 8]

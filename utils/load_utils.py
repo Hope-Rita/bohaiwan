@@ -99,7 +99,7 @@ def load_cols(filename, cols, load_func, random_pick=False):
     return data
 
 
-def load_one_col(filename, col, load_func, random_pick=False, add_date=False, split=True):
+def load_one_col(filename, col, load_func, random_pick=False, add_date=False, split=True, normalize=True):
     """
     根据列号，加载指定的列
     :param filename: 存放数据的 csv 文件
@@ -108,6 +108,7 @@ def load_one_col(filename, col, load_func, random_pick=False, add_date=False, sp
     :param random_pick: 是否随机选取
     :param add_date: 是否返回日期序列
     :param split: 是否划分训练集和测试集
+    :param normalize: 是否对数据集进行归一化
     :return: 四个数据集
     """
     if not callable(load_func):
@@ -115,7 +116,7 @@ def load_one_col(filename, col, load_func, random_pick=False, add_date=False, sp
 
     print(f'开始从{filename}载入数据')
     # 加载数据集
-    loaded_data = load_func(filename, col, add_date)
+    loaded_data = load_func(filename, col, add_date, normalize)
 
     if split:
         # 划分训练集和测试集

@@ -141,6 +141,12 @@ def one_col_cross_validation(filename, col, func, k=10, is_draw_pic=True):
                                        })
 
 
+def predict_future(filename, func, col):
+    x_train, y_train, x_test, dates = gen_dataset.future_dataset(filename, col)
+    pred = func(x_train, y_train, x_test)
+    print(pred)
+
+
 if __name__ == '__main__':
     # 存放预测结果文件的路径
     pred_res_dir = conf.get_config('predict-result', 'server')
@@ -152,7 +158,8 @@ if __name__ == '__main__':
     # cross_validation(pred_target_filename, lr.lr_predict)
     # one_col_cross_validation(pred_target_filename, pred_col, lr.lr_predict)
     # analysis_all_cols(pred_target_filename, recurrent.rnn_union_predict)
-    predict_one_col(pred_target_filename, pred_col, recurrent.rnn_union_predict, is_draw_pic=False)
+    # predict_one_col(pred_target_filename, pred_col, recurrent.rnn_union_predict, is_draw_pic=False)
     # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     # predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
     # classical_models(pred_target_filename)
+    predict_future(pred_target_filename, recurrent.rnn_union_predict, pred_col)

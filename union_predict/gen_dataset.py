@@ -21,24 +21,25 @@ if env_factor_num != add_high_tp + add_low_tp + add_waterline:
 print(f'\n配置文件：{conf.path}，载入gen_dataset模块, pred: {pred_len}, future: {future_days}, env: {env_factor_num}')
 
 
-def gen_data(filename, col_id, add_date=False):
+def gen_data(filename, col_id, add_date=False, normalize=True):
     """
     生成一个列的数据集
     :param filename: 数据来源的文件
     :param col_id: 列号
     :param add_date: 是否返回预测那天的日期
+    :param normalize: 是否对数据进行归一化
     :return: x in shape(m, pred_len + env_factor_len), y in shape(m,)
     """
-    return produce_dataset(filename, col_id, add_date=add_date)
+    return produce_dataset(filename, col_id, add_date=add_date, normalize=normalize)
 
 
-def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
+def produce_dataset(filename, col_id, add_date, normalize):
     """
     根据不同的输入生成数据集
     :param filename: 数据来源的文件
     :param col_id: 列号
-    :param section_neighbors: 该列所处的 section 上所有的列号
     :param add_date: 是否返回预测那天的日期
+    :param normalize: 是否对
     :return: 返回根据要求生成的 x 和 y， 若 add_date 为真， 则加上预测日期的序列
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
@@ -57,36 +58,25 @@ def produce_dataset(filename, col_id, section_neighbors=None, add_date=False):
                 break
 
             # 放入时间序列
-            series = []
-            if section_neighbors is not None:
-
-                # 检查类型和值
-                if type(section_neighbors) is not list:
-                    raise TypeError('section_neighbor 必须是列表')
-                if len(section_neighbors) <= 0:
-                    raise ValueError('section_neighbor 为空列表')
-
-                for col in section_neighbors:
-                    series.extend(frame.loc[d: d + pd.Timedelta(days=(pred_len - 1)), col].to_list())
-            else:
-                series.extend(frame.loc[d: d + pd.Timedelta(days=(pred_len - 1)), col_id].to_list())
-            x.append(series)
-
+            series = frame.loc[d: d + pd.Timedelta(days=(pred_len - 1)), col_id].to_list()
             # 放入外部特征
             if add_high_tp:
-                x[-1].append(weather_frame.loc[pred_date, 'high_tp'])
+                series.append(weather_frame.loc[pred_date, 'high_tp'])
             if add_low_tp:
-                x[-1].append(weather_frame.loc[pred_date, 'low_tp'])
+                series.append(weather_frame.loc[pred_date, 'low_tp'])
             if add_waterline:
-                x[-1].append(waterline_frame.loc[pred_date, 'waterline'])
+                series.append(waterline_frame.loc[pred_date, 'waterline'])
 
+            x.append(series)
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)
 
+    if normalize:
+        x = data_process.col_normalization(np.array(x))
     if add_date:
-        return data_process.col_normalization(np.array(x)), np.array(y), np.array(predict_dates)
+        return x, np.array(y), np.array(predict_dates)
     else:
-        return data_process.col_normalization(np.array(x)), np.array(y)
+        return x, np.array(y)
 
 
 def load_one_col(filename, col, add_date=False, random_pick=False):
@@ -109,6 +99,37 @@ def load_one_col_not_split(filename, col, add_date=False):
     :param add_date: 是否增加日期序列
     """
     return ld.load_one_col(filename, col, load_func=gen_data, add_date=add_date, split=False)
+
+
+def future_dataset(filename, col):
+    train_x, train_y, train_date \
+        = ld.load_one_col(filename, col, load_func=gen_data, add_date=True, split=False, normalize=False)
+    data_frame = pd.read_csv(filename, parse_dates=True, index_col='date')
+    weather_frame = pd.read_csv(weather, parse_dates=True, index_col='date')
+    waterline_frame = pd.read_csv(waterline, parse_dates=True, index_col='date')
+
+    test_x = []
+    test_date = []
+    for day in pd.date_range(data_frame.index[-future_days], data_frame.index[-1], freq='D'):
+        series = data_frame.loc[day - pd.Timedelta(days=(pred_len - 1)): day, col].to_list()
+        # 放入外部特征
+        pred_date = day + pd.Timedelta(days=future_days)
+        if add_high_tp:
+            series.append(weather_frame.loc[pred_date, 'high_tp'])
+        if add_low_tp:
+            series.append(weather_frame.loc[pred_date, 'low_tp'])
+        if add_waterline:
+            series.append(waterline_frame.loc[pred_date, 'waterline'])
+
+        test_x.append(series)
+        test_date.append(pred_date)
+
+    # 对 x 进行列归一化
+    tmp = data_process.col_normalization(np.concatenate((train_x, test_x)))
+    train_x = tmp[:len(train_x)]
+    test_x = tmp[len(train_x):]
+
+    return np.array(train_x), np.array(train_y), np.array(test_x), np.concatenate((train_date, test_date))
 
 
 def load_cols(filename, random_pick=False):
