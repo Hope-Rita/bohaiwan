@@ -100,4 +100,4 @@ if __name__ == '__main__':
     pred_target_filename = conf.get_data_loc(pred_target)
 
     # run_all_models(pred_target_filename)
-    cross_validation(pred_target_filename, xgb.xgb_predict)
+    cross_validation(pred_target_filename, mlp.mlp_predict)

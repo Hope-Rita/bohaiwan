@@ -49,9 +49,9 @@ def gen_data(filename, col_id, add_date=False):
         tmp = list()
         tmp.append(get_matched_val(temperature_frame, matched_cols, col_id, 'temperature', date))
         tmp.append(get_matched_val(pressure_frame, matched_cols, col_id, 'pressure', date))
-        # tmp.append(weather_frame.loc[date, 'high_tp'])
-        # tmp.append(weather_frame.loc[date, 'low_tp'])
-        # tmp.append(waterline_frame.loc[date, 'waterline'])
+        tmp.append(weather_frame.loc[date, 'high_tp'])
+        tmp.append(weather_frame.loc[date, 'low_tp'])
+        tmp.append(waterline_frame.loc[date, 'waterline'])
         x.append(tmp)
         predict_dates.append(date)
 

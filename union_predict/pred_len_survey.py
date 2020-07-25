@@ -200,6 +200,6 @@ def repeat_run(start, end, func):
 if __name__ == '__main__':
 
     pred_model = recurrent.rnn_union_predict
-    # repeat_run(20, 21, pred_model)
+    repeat_run(20, 21, pred_model)
     # avg_box_plot(pred_model, 20)
-    avg_col_trend(pred_model, 20)
+    # avg_col_trend(pred_model, 20)

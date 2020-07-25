@@ -141,10 +141,23 @@ def one_col_cross_validation(filename, col, func, k=10, is_draw_pic=True):
                                        })
 
 
-def predict_future(filename, func, col):
+def future_predict(filename, func, col):
     x_train, y_train, x_test, dates = gen_dataset.future_dataset(filename, col)
     pred = func(x_train, y_train, x_test)
     print(pred)
+    data_process.dump_pred_result(f'future_pred/{func.__name__}/metrics',
+                                  f'{col}.csv',
+                                  None,
+                                  np.concatenate((y_train, pred)),
+                                  dates
+                                  )
+
+
+def all_cols_future_predict(filename, func):
+    cols = gen_dataset.get_all_col_name(filename)
+    for col in cols:
+        conf.modify_config('predict-col', new_val=col)
+        future_predict(filename, func, col)
 
 
 if __name__ == '__main__':
@@ -162,4 +175,5 @@ if __name__ == '__main__':
     # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
     # predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
     # classical_models(pred_target_filename)
-    predict_future(pred_target_filename, recurrent.rnn_union_predict, pred_col)
+    # future_predict(pred_target_filename, recurrent.rnn_union_predict, pred_col)
+    all_cols_future_predict(pred_target_filename, recurrent.rnn_union_predict)

@@ -56,7 +56,11 @@ def dump_pred_result(dirname, filename, y, pred, date):
     :param pred: 预测值
     :param date: 日期，这里是所有的日期，要截断
     """
-    df = pd.DataFrame({'truth': y, 'predict': pred}, index=date[-len(y):])
+
+    if not y:
+        df = pd.DataFrame({'value': pred}, index=date)
+    else:
+        df = pd.DataFrame({'truth': y, 'predict': pred}, index=date[-len(y):])
 
     if not os.path.exists(dirname):
         os.makedirs(dirname)
