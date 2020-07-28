@@ -61,8 +61,8 @@ def parse_date(text):
 def main():
 
     data = []
-    for year in [2016, 2017]:
-        for month in range(1, 13):
+    for year in [2020]:
+        for month in range(1, 7):
             print(f'爬取{year}年{month}月的天气数据')
             month_str = '0' + str(month) if month < 10 else str(month)
             url = 'http://www.tianqihoubao.com/lishi/nanjing/month/' + str(year) + month_str + '.html'

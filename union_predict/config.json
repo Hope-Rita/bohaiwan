@@ -1,6 +1,6 @@
 {
-    "predict-target":"taseometer",
-    "predict-col":"FSS_S01_B1_003",
+    "predict-target":"taseometer-pro",
+    "predict-col":"FSS_S07_B1_004",
     "device":{
         "use-gpu": true,
         "cuda":"cuda:3"
@@ -24,8 +24,8 @@
             "batch-size":16,
             "learning-rate":0.01,
             "epoch-num":300,
-            "load-model": false,
-            "save-model": true
+            "load-model": true,
+            "save-model": false
         },
         "mlp":{
             "hidden-size": [32, 16, 8]

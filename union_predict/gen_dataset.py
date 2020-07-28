@@ -102,8 +102,6 @@ def load_one_col_not_split(filename, col, add_date=False):
 
 
 def future_dataset(filename, col):
-    train_x, train_y, train_date \
-        = ld.load_one_col(filename, col, load_func=gen_data, add_date=True, split=False, normalize=False)
     data_frame = pd.read_csv(filename, parse_dates=True, index_col='date')
     weather_frame = pd.read_csv(weather, parse_dates=True, index_col='date')
     waterline_frame = pd.read_csv(waterline, parse_dates=True, index_col='date')
@@ -124,12 +122,7 @@ def future_dataset(filename, col):
         test_x.append(series)
         test_date.append(pred_date)
 
-    # 对 x 进行列归一化
-    tmp = data_process.col_normalization(np.concatenate((train_x, test_x)))
-    train_x = tmp[:len(train_x)]
-    test_x = tmp[len(train_x):]
-
-    return np.array(train_x), np.array(train_y), np.array(test_x), np.concatenate((train_date, test_date))
+    return np.array(test_x), test_date
 
 
 def load_cols(filename, random_pick=False):
