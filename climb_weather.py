@@ -52,17 +52,15 @@ def parse_html(page_content):
 
 
 def parse_date(text):
-    y = text.find('年')
-    m = text.find('月')
-    d = text.find('日')
-    return datetime.date(int(text[y - 4: y]), int(text[m - 2: m]), int(text[d - 2: d]))
+    y, m, d = re.findall('\d+', text)
+    return datetime.date(int(y), int(m), int(d))
 
 
 def main():
 
     data = []
-    for year in [2020]:
-        for month in range(1, 7):
+    for year in range(2016, 2021):
+        for month in range(5, 7):
             print(f'爬取{year}年{month}月的天气数据')
             month_str = '0' + str(month) if month < 10 else str(month)
             url = 'http://www.tianqihoubao.com/lishi/nanjing/month/' + str(year) + month_str + '.html'
@@ -71,7 +69,7 @@ def main():
             data.extend(parse_html(h))
 
     frame = pd.DataFrame(data, columns=['date', 'low_tp', 'high_tp', 'weather', 'wind'])
-    frame.to_csv('weather.csv', index=False)
+    frame.to_csv('weather2.csv', index=False)
 
 
 if __name__ == '__main__':
