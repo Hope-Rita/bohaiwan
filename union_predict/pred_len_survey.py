@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+from importlib import reload
+
 
 from utils.config import Config
 config_path = '../union_predict/pred_len_survey.json'
@@ -17,7 +19,6 @@ from baseline import xgb
 from union_predict import predict
 from utils import data_process
 from union_predict import gen_dataset
-from importlib import reload
 
 
 def produce_result(func, repeat_id=None):

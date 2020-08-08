@@ -59,7 +59,7 @@ def parse_date(text):
 def main():
 
     data = []
-    for year in range(2016, 2021):
+    for year in range(2011, 2021):
         for month in range(5, 7):
             print(f'爬取{year}年{month}月的天气数据')
             month_str = '0' + str(month) if month < 10 else str(month)

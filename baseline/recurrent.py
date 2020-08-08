@@ -56,7 +56,6 @@ def union_predict(model, x_train, y_train, x_test):
     pred = model(x_test)
     pred = pred.data.to('cpu').numpy()
     pred = pred.reshape(-1)
-    # pred = normal.inverse_transform(pred)
     return pred
 
 
