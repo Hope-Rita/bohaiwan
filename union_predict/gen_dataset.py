@@ -28,19 +28,8 @@ def gen_data(filename, col_id, add_date=False, normalize=True):
     :param col_id: 列号
     :param add_date: 是否返回预测那天的日期
     :param normalize: 是否对数据进行归一化
-    :return: x in shape(m, pred_len + env_factor_len), y in shape(m,)
-    """
-    return produce_dataset(filename, col_id, add_date=add_date, normalize=normalize)
-
-
-def produce_dataset(filename, col_id, add_date, normalize):
-    """
-    根据不同的输入生成数据集
-    :param filename: 数据来源的文件
-    :param col_id: 列号
-    :param add_date: 是否返回预测那天的日期
-    :param normalize: 是否对
     :return: 返回根据要求生成的 x 和 y， 若 add_date 为真， 则加上预测日期的序列
+             x in shape(m, pred_len + env_factor_len), y in shape(m,)
     """
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
     weather_frame = pd.read_csv(weather, parse_dates=True, index_col='date')
@@ -53,21 +42,13 @@ def produce_dataset(filename, col_id, add_date, normalize):
     for ds in dates:
         for d in ds:
 
+            # 计算预测日期
             pred_date = d + pd.Timedelta(days=(pred_len + future_days - 1))
             if pred_date > ds[-1]:
                 break
 
-            # 放入时间序列
-            series = frame.loc[d: d + pd.Timedelta(days=(pred_len - 1)), col_id].to_list()
-            # 放入外部特征
-            if add_high_tp:
-                series.append(weather_frame.loc[pred_date, 'high_tp'])
-            if add_low_tp:
-                series.append(weather_frame.loc[pred_date, 'low_tp'])
-            if add_waterline:
-                series.append(waterline_frame.loc[pred_date, 'waterline'])
-
-            x.append(series)
+            # 组装数据
+            x.append(produce_series(frame, weather_frame, waterline_frame, col_id, d, pred_date))
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)
 
@@ -77,6 +58,30 @@ def produce_dataset(filename, col_id, add_date, normalize):
         return x, np.array(y), np.array(predict_dates)
     else:
         return x, np.array(y)
+
+
+def produce_series(source_data, weather, waterline, col_id, start_date, pred_date):
+    """
+    产生输入序列
+    :param source_data: 数据来源的文件 DataFrame
+    :param weather: 存放天气的 DataFrame
+    :param waterline: 存放水位数据的 DataFrame
+    :param col_id: 列号
+    :param start_date: 时间序列开始的日期
+    :param pred_date: 预测的日期
+    :return: 输入序列（历史数据 + 环境数据），list 格式
+    """
+    # 放入时间序列
+    series = source_data.loc[start_date: start_date + pd.Timedelta(days=(pred_len - 1)), col_id].to_list()
+    # 放入外部特征
+    if add_high_tp:
+        series.append(weather.loc[pred_date, 'high_tp'])
+    if add_low_tp:
+        series.append(weather.loc[pred_date, 'low_tp'])
+    if add_waterline:
+        series.append(waterline.loc[pred_date, 'waterline'])
+
+    return series
 
 
 def load_one_col(filename, col, add_date=False, random_pick=False):
@@ -102,27 +107,35 @@ def load_one_col_not_split(filename, col, add_date=False):
 
 
 def future_dataset(filename, col):
+    """
+    生成预测未来趋势用的数据集
+    :param filename: 存放数据的 CSV 文件
+    :param col: 使用的传感器的列号
+    :return: 未来数据的输入（numpy 数组）以及预测的日期（list）
+    """
     data_frame = pd.read_csv(filename, parse_dates=True, index_col='date')
     weather_frame = pd.read_csv(weather, parse_dates=True, index_col='date')
     waterline_frame = pd.read_csv(waterline, parse_dates=True, index_col='date')
 
-    test_x = []
-    test_date = []
+    future_data = []
+    dates = []
+
+    # 一共取 future_days 天的数据
     for day in pd.date_range(data_frame.index[-future_days], data_frame.index[-1], freq='D'):
-        series = data_frame.loc[day - pd.Timedelta(days=(pred_len - 1)): day, col].to_list()
-        # 放入外部特征
         pred_date = day + pd.Timedelta(days=future_days)
-        if add_high_tp:
-            series.append(weather_frame.loc[pred_date, 'high_tp'])
-        if add_low_tp:
-            series.append(weather_frame.loc[pred_date, 'low_tp'])
-        if add_waterline:
-            series.append(waterline_frame.loc[pred_date, 'waterline'])
 
-        test_x.append(series)
-        test_date.append(pred_date)
+        # 生成输入序列
+        series = produce_series(source_data=data_frame,
+                                weather=weather_frame,
+                                waterline=waterline_frame,
+                                col_id=col,
+                                start_date=day - pd.Timedelta(days=(pred_len - 1)),
+                                pred_date=pred_date
+                                )
+        future_data.append(series)
+        dates.append(pred_date)
 
-    return np.array(test_x), test_date
+    return np.array(future_data), dates
 
 
 def load_cols(filename, random_pick=False):
