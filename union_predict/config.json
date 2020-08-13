@@ -1,6 +1,6 @@
 {
-    "predict-target":"taseometer-pro",
-    "predict-col":"FSS_S07_B3_007",
+    "predict-target":"taseometer-2020",
+    "predict-col":"FSS_S07_B4_009",
     "device":{
         "use-gpu": true,
         "cuda":"cuda:3"

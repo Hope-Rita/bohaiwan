@@ -13,12 +13,12 @@ from baseline import recurrent
 from union_predict import gen_dataset
 import utils.load_utils as ld
 from utils import data_process
+from utils import normalization
 
 
 pred_target = conf.get_config('predict-target')
 pred_target_filename = conf.get_data_loc(pred_target)
 pred_col = conf.get_config('predict-col')
-future_filename = conf.get_data_loc('taseometer-pro')
 pred_func = recurrent.rnn_union_predict
 temperature_bias = 3.715
 
@@ -32,19 +32,18 @@ def future_predict():
                                                    split=False,
                                                    normalize=False
                                                    )
-    test_x, pred_dates = gen_dataset.future_dataset(future_filename, pred_col)
+    test_x, pred_dates = gen_dataset.future_dataset(pred_target_filename, pred_col)
 
     test_dates = [d - pd.Timedelta(days=conf.get_config('data-parameters', 'future-days')) for d in pred_dates]
     observe_val = np.array([ts[-4] for ts in test_x])
 
-    tmp = data_process.col_normalization(np.concatenate((train_x, test_x)))
-    train_x = tmp[:len(train_x)]
-    test_x = tmp[len(train_x):]
-
     train_x = np.array(train_x)
-    train_y = np.array(train_y)
-    test_x = np.array(test_x)
+    train_x, normalizer = data_process.col_normalization_with_normalizer(train_x)
+    test_x = data_process.col_transform(test_x, normalizer)
+    # train_x = normalization.sigmoid(train_x)
+    # test_x = normalization.sigmoid(test_x)
 
+    # 进行预测
     pred = pred_func(train_x, train_y, test_x)
     print(pred)
     print(pred_dates)
@@ -76,7 +75,7 @@ def future_predict2():
                                                        split=False,
                                                        normalize=False
                                                        )
-        test_x, pred_dates = gen_dataset.future_dataset(future_filename, pred_col)
+        test_x, pred_dates = gen_dataset.future_dataset(pred_target_filename, pred_col)
         # 取最后一天
         test_x = np.array([test_x[-1]])
         dates.append(pred_dates[-1])
@@ -109,7 +108,7 @@ def variation_paras(para, variation_range):
                                                    split=False,
                                                    normalize=False
                                                    )
-    test_x, pred_dates = gen_dataset.future_dataset(future_filename, pred_col)
+    test_x, pred_dates = gen_dataset.future_dataset(pred_target_filename, pred_col)
     variation_range = list(variation_range)
 
     change_idx = -1 if para == 'waterline' else (-2 if para == 'low_tp' else -3)
@@ -144,7 +143,7 @@ def variation_paras2(temperature_range, waterline_range):
                                                    split=False,
                                                    normalize=False
                                                    )
-    test_x, pred_dates = gen_dataset.future_dataset(future_filename, pred_col)
+    test_x, pred_dates = gen_dataset.future_dataset(pred_target_filename, pred_col)
 
     res = {}
 
@@ -187,7 +186,7 @@ def variation_paras3(para, variation_range):
                                                    split=False,
                                                    normalize=False
                                                    )
-    test_x, pred_dates = gen_dataset.future_dataset(future_filename, pred_col)
+    test_x, pred_dates = gen_dataset.future_dataset(pred_target_filename, pred_col)
     variation_range = list(variation_range)
 
     change_idx = -1 if para == 'waterline' else (-2 if para == 'low_tp' else -3)
@@ -199,10 +198,10 @@ def variation_paras3(para, variation_range):
         var_input.append(tmp)
 
     var_input = np.array(var_input)
-
-    tmp = data_process.col_normalization(np.concatenate((train_x, var_input)))
-    train_x = tmp[:len(train_x)]
-    var_input = tmp[len(train_x):]
+    train_x = np.array(train_x)
+    train_x, normalizer = data_process.col_normalization_with_normalizer(train_x)
+    var_input = data_process.col_transform(var_input, normalizer)
+    # var_input = normalization.sigmoid(var_input)
 
     pred = pred_func(train_x, train_y, var_input)
     print(variation_range)
