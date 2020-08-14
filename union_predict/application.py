@@ -133,7 +133,7 @@ def variation_paras(para, variation_range):
     plt.show()
 
 
-def variation_paras2(temperature_range, waterline_range):
+def combine_variation_paras(temperature_range, waterline_range):
 
     # train_x 要存一份用来保证每次的输入
     original_train_x, train_y, train_date = ld.load_one_col(pred_target_filename,
@@ -173,7 +173,7 @@ def variation_paras2(temperature_range, waterline_range):
             xticks=temperature_range,
             yticks=waterline_range,
             xlabel='Daily average temperature',
-            ylabel='Waterline',
+            ylabel='Daily water level',
             pic_title=pred_col
             )
 
@@ -262,4 +262,4 @@ if __name__ == '__main__':
     # variation_paras('high_tp', v2)
     variation_paras3('high_tp', v2)
     variation_paras3('low_tp', v3)
-    variation_paras2(temperature_range=v4, waterline_range=v1)
+    combine_variation_paras(temperature_range=v4, waterline_range=v1)
