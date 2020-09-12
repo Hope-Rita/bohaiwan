@@ -2,6 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
+font = {'family' : 'Times New Roman',
+        'size'   : 12
+        }
+plt.rc('font', **font)
+# plt.rcParams['font.sans-serif']=['Times New Roman']
+# plt.rcParams.update({'font.size': 12})
 from importlib import reload
 
 
@@ -13,7 +19,6 @@ from baseline import recurrent
 from union_predict import gen_dataset
 import utils.load_utils as ld
 from utils import data_process
-from utils import normalization
 
 
 pred_target = conf.get_config('predict-target')
@@ -227,39 +232,39 @@ def hot_map(matrix, xticks, yticks, xlabel, ylabel, pic_title):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.colorbar()
-    plt.xticks(range(0, len(xticks), 2), [xticks[i] for i in range(len(xticks)) if i % 2 == 0], rotation=90)
-    plt.yticks(range(0, len(yticks), 2), [yticks[i] for i in range(len(yticks)) if i % 2 == 0])
+    # plt.xlim(18.715, 36.216)
+    plt.xticks(range(0, len(xticks), 5), [round(xticks[i], 1) for i in range(len(xticks)) if i % 5 == 0])
+    # plt.xticks(range(19, 37, 1), [i for i in range(19, 37, 1)])
+    # plt.xticks(np.linspace(19, 36, 10))
+    plt.yticks(range(0, len(yticks), 4), [yticks[i] for i in range(len(yticks)) if i % 4 == 0])
+    # plt.xticks(xticks)
+    # plt.yticks(yticks)
     plt.title(pic_title)
     plt.show()
 
 
 if __name__ == '__main__':
-    # future_predict()
-    # future_predict2()
+
     v1 = [2 + 0.25 * i for i in range(41)]
     # v1 = [2 + 0.25 * i for i in range(13)]
-    # variation_paras('waterline', v1)
     v2 = [24 + 0.5 * i for i in range(25)]
-    # variation_paras('high_tp', v2)
     v3 = [18 + 0.5 * i for i in range(25)]
-    # variation_paras('low_tp', v3)
 
-    v4 = [18.715 + 0.5 * i for i in range(34)]
+    v4 = [18.715 + 0.5 * i for i in range(36)]
     # v4 = [29.715 + 0.5 * i for i in range(34)]
     # v4 = [20.215 + 0.5 * i for i in range(33)]
     # v4 = [18 + 0.5 * i for i in range(39)]
-    # variation_paras2(temperature_range=v4, waterline_range=v1)
 
     conf.modify_config('model-parameters', 'recurrent', 'load-model', new_val=False)
     conf.modify_config('model-parameters', 'recurrent', 'save-model', new_val=True)
     reload(recurrent)
     future_predict()
+    # future_predict2()
+
     conf.modify_config('model-parameters', 'recurrent', 'load-model', new_val=True)
     conf.modify_config('model-parameters', 'recurrent', 'save-model', new_val=False)
     reload(recurrent)
-    # variation_paras2(temperature_range=v4, waterline_range=v1)
-    variation_paras3('waterline', v1)
-    # variation_paras('high_tp', v2)
-    variation_paras3('high_tp', v2)
-    variation_paras3('low_tp', v3)
+    # variation_paras3('waterline', v1)
+    # variation_paras3('high_tp', v2)
+    # variation_paras3('low_tp', v3)
     combine_variation_paras(temperature_range=v4, waterline_range=v1)

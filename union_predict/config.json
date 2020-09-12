@@ -1,9 +1,9 @@
 {
     "predict-target":"taseometer-2020",
-    "predict-col":"FSS_S07_B4_009",
+    "predict-col":"FSS_S07_B3_007",
     "device":{
         "use-gpu": true,
-        "cuda":"cuda:3"
+        "cuda":"cuda:0"
     },
     "data-parameters":{
         "pred-len":14,
@@ -39,5 +39,5 @@
         "server": "/home/lwt/bohaiwan/union_predict/model_paras",
         "local": "C:\\study\\WorkSpace\\bohaiwan\\union_predict\\model_paras"
     },
-    "run-on-local": false
+    "run-on-local": true
 }
