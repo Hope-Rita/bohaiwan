@@ -27,7 +27,7 @@ def gen_data(filename, col_id, add_date=False, normalize=True):
     :param filename: 数据来源的文件
     :param col_id: 列号
     :param add_date: 是否返回预测那天的日期
-    :param normalize: 是否对数据进行归一化
+    :param normalize: 是否对 x 进行归一化
     :return: 返回根据要求生成的 x 和 y， 若 add_date 为真， 则加上预测日期的序列
              x in shape(m, pred_len + env_factor_len), y in shape(m,)
     """
@@ -52,8 +52,9 @@ def gen_data(filename, col_id, add_date=False, normalize=True):
             y.append(frame.loc[pred_date, col_id])
             predict_dates.append(pred_date)
 
+    x = np.array(x)
     if normalize:
-        x = data_process.col_normalization(np.array(x))
+        x = data_process.col_normalization(x)
     if add_date:
         return x, np.array(y), np.array(predict_dates)
     else:
