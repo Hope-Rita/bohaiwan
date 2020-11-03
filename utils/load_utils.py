@@ -81,7 +81,7 @@ def load_cols(filename, cols, load_func, random_pick=False):
     :param cols: 要加载的列
     :param load_func: 加载数据使用的函数
     :param random_pick: 是否随机选取
-    :return: dict(numpy.ndarray) key 是列名
+    :return: dict(key=col_name, val=(tuple of 4 numpy.array))
     """
     if not callable(load_func):
         raise ValueError('未提供载入数据的方法')
@@ -140,7 +140,7 @@ def dataset_split(x, y, rate=0.8, random_pick=False, return_numpy=True):
     :param rate: 训练集占比
     :param random_pick: 是否随机选取
     :param return_numpy: 是否返回 numpy 数组
-    :return: 四个数据集
+    :return: 元组，由四个数据集组成
     """
     if len(x) != len(y):
         raise ValueError('x, y 长度不一致')

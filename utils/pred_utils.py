@@ -46,7 +46,7 @@ def predict_one_cols(func, data):
     """
     使用给定的模型对所有列的数据进行分别训练和测试
     :param func: 用于预测的模型
-    :param data: 用于预测的数据, dict(key=col_name)
+    :param data: 用于预测的数据, dict(key=col_name, val=(tuple of dataset))
     :return: 预测结果的评估指标，list[dict()], 每个列表元素代表一个列的指标（存在字典里面）
     """
 

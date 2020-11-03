@@ -41,6 +41,14 @@ para_save_path = conf.get_config('model-paras', 'local' if conf.get_config('run-
 
 
 def union_predict(model, x_train, y_train, x_test):
+    """
+    使用循环神经网络模型来进行联合预测
+    @param model: 使用的具体模型
+    @param x_train: 类型为 numpy 数组，形状为 m_train x (p + k)
+    @param y_train: 类型为 numpy 数组，形状为 (m_train,)
+    @param x_test: 类型为 numpy 数组，形状为 m_test x (p + k)
+    @return: 预测结果，类型是 numpy 数组
+    """
     # 加载数据
     data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
 
