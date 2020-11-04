@@ -57,7 +57,7 @@ def dump_pred_result(dirname, filename, y, pred, date):
     :param date: 日期，这里是所有的日期，要截断
     """
 
-    if not y:
+    if y is None:
         df = pd.DataFrame({'value': pred}, index=date)
     else:
         df = pd.DataFrame({'truth': y, 'predict': pred}, index=date[-len(y):])
