@@ -3,7 +3,6 @@ import torch
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import trange
-
 from utils.config import Config
 from baseline.recurrent_reg import RNNReg, GRUReg, LSTMReg
 from baseline.recurrent_fusion import RNNFusion, GRUFusion, LSTMFusion
@@ -13,19 +12,18 @@ from utils.metric import RMSELoss
 
 
 conf = Config()
-
 # 加载模型相关参数
 num_workers, batch_size, epoch_num, learning_rate, save_model, load_model \
-            = conf.get_config('model-parameters',
-                               'recurrent',
-                               inner_keys=['num-workers',
-                                           'batch-size',
-                                           'epoch-num',
-                                           'learning-rate',
-                                           'save-model',
-                                           'load-model'
-                                           ]
-                               )
+    = conf.get_config('model-parameters',
+                      'recurrent',
+                      inner_keys=['num-workers',
+                                  'batch-size',
+                                  'epoch-num',
+                                  'learning-rate',
+                                  'save-model',
+                                  'load-model'
+                                  ]
+                      )
 rnn_hidden_size = conf.get_config('model-parameters', 'recurrent', 'rnn-hidden-size')
 gru_hidden_size = conf.get_config('model-parameters', 'recurrent', 'gru-hidden-size')
 lstm_hidden_size = conf.get_config('model-parameters', 'recurrent', 'lstm-hidden-size')
@@ -67,6 +65,32 @@ def union_predict(model, x_train, y_train, x_test):
     return pred
 
 
+def section_union_predict(model, x_train, y_train, x_test):
+    """
+    使用循环神经网络模型来对整个 section 的数据进行联合预测
+    @param model: 使用的具体模型
+    @param x_train: 类型为 numpy 数组，形状为 m_train x (p + k) x col_num
+    @param y_train: 类型为 numpy 数组，形状为 (m_train, col_num)
+    @param x_test: 类型为 numpy 数组，形状为 m_test x (p + k) x col_num
+    @return: 预测结果，类型是 numpy 数组
+    """
+    # 加载数据
+    data_loader, x_test = get_dataloader(x_train, y_train, x_test, normalize=False)
+
+    if load_model:  # 加载已训练好的模型
+        section_name = conf.get_config('predict-section')
+        path = f'{para_save_path}/{section_name}_{model.name()}.pkl'
+        model.load_state_dict(torch.load(path))
+        print(f'从{path}处加载模型参数')
+    else:  # 训练模型
+        model = train_model(model, data_loader)
+
+    # 将输出的结果进行处理并返回
+    pred = model(x_test)
+    pred = pred.data.to('cpu').numpy()
+    return pred
+
+
 def lstm_union_predict(x_train, y_train, x_test):
     model = LSTMFusion(time_series_len=pred_len, input_feature=1).to(device)
     return union_predict(model, x_train, y_train, x_test)
@@ -82,10 +106,9 @@ def rnn_union_predict(x_train, y_train, x_test):
     return union_predict(model, x_train, y_train, x_test)
 
 
-def lstm_section_predict(x_train, y_train, x_test):
-    print(x_train.shape)
-    model = LSTMSectionFusion(seq_len=x_train.shape[1], time_series_len=pred_len, env_factor_len=env_factor_num)
-    return union_predict(model, x_train, y_train, x_test)
+def rnn_section_predict(x_train, y_train, x_test):
+    model = RNNFusion(time_series_len=pred_len, input_feature=16, output_size=16).to(device)
+    return section_union_predict(model, x_train, y_train, x_test)
 
 
 def lstm_predict(x_train, y_train, x_test):
@@ -102,7 +125,6 @@ def lstm_predict(x_train, y_train, x_test):
 
 
 def train_model(model, data_loader):
-
     rmse = RMSELoss()
     opt = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=2, threshold=1e-3, min_lr=1e-6)
@@ -154,9 +176,9 @@ def get_dataloader(x_train, y_train, x_test, normalize=True):
         y_train = normal.transform(y_train)
         # x_test = normal.transform(x_test)
 
-    # 改变形状格式
-    x_train = x_train.reshape(-1, 1, x_train.shape[1])
-    x_test = x_test.reshape(-1, 1, x_test.shape[1])
+    if x_train.ndim == 2:  # 改变形状格式, 使其变成三维的
+        x_train = x_train.reshape(-1, 1, x_train.shape[1])
+        x_test = x_test.reshape(-1, 1, x_test.shape[1])
 
     # 转换成 tensor
     x_train = torch.from_numpy(x_train).float().to(device)

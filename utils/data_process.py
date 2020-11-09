@@ -94,8 +94,34 @@ def col_normalization_with_normalizer(data):
     """
     normalizers = []
     for i in range(data.shape[1]):
-        normal_x = normalization.MinMaxNormal(data[:, i])
-        data[:, i] = normal_x.transform(data[:, i])
+        x = data[:, i]
+        normal_x = normalization.MinMaxNormal(x)
+        data[:, i] = normal_x.transform(x)
+        normalizers.append(normal_x)
+
+    return data, normalizers
+
+
+def section_normalization(data):
+    """
+    对样本集的每一个切面进行归一化
+    :param data: 类型为 numpy 数组，形状为 (m, col_num, p + k)
+    :return: 归一化后的样本集
+    """
+    return section_normalization_with_normalizer(data)[0]
+
+
+def section_normalization_with_normalizer(data):
+    """
+    对样本集的每一个切面进行归一化
+    :param data: 类型为 numpy 数组, 形状为 (m, col_num, p + k)
+    :return: 归一化后的样本集和各个切面的 normalizers
+    """
+    normalizers = []
+    for i in range(data.shape[2]):
+        x = data[:, :, i]
+        normal_x = normalization.MinMaxNormal(x)
+        data[:, :, i] = normal_x.transform(x)
         normalizers.append(normal_x)
 
     return data, normalizers

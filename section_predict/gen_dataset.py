@@ -23,7 +23,7 @@ def gen_section_data(filename, section_name, normalize=True):
     :param section_name: 段号
     :param normalize: 是否进行归一化
     :return: x 是该 section 上所有列的时间序列加上环境因素， y 是 col_id 列在预测那天的数值
-             x in shape(m, pred_len + env_factor_len, col_num), y in shape(m, col_num)
+             x in shape(m, col_num, pred_len + env_factor_len), y in shape(m, col_num)
     """
 
     frame = pd.read_csv(filename, parse_dates=True, index_col='date')
@@ -38,12 +38,12 @@ def gen_section_data(filename, section_name, normalize=True):
 
     x_section = np.array(x_section)
     y_section = np.array(y_section)
-    x_section = x_section.transpose((1, 2, 0))
+    x_section = x_section.swapaxes(0, 1)  # 使 x 的形状为 (m, col_num, p + k)
     y_section = y_section.T
 
     if normalize:
-        x_section = data_process.col_normalization(x_section)
-    return x_section, y_section
+        x_section = data_process.section_normalization(x_section)
+    return x_section, y_section, cols
 
 
 def load_one_section(filename, section_name):
@@ -53,9 +53,9 @@ def load_one_section(filename, section_name):
     :param section_name: section 名称，格式为 SXX
     :return: tuple of 4 datasets
     """
-
-    x_section, y_section = gen_section_data(filename, section_name)
-    return ld.dataset_split(x_section, y_section)
+    print(f'从 {filename} 中加载数据')
+    x_section, y_section, section_members = gen_section_data(filename, section_name)
+    return ld.dataset_split(x_section, y_section) + (section_members,)
 
 
 def get_section_members(section_name, cols):

@@ -1,5 +1,6 @@
 {
   "predict-target": "taseometer",
+  "predict-section": "S01",
   "data-parameters": {
       "pred-len": 14,
       "future-days": 14,
@@ -18,7 +19,7 @@
             "num-workers":0,
             "batch-size":16,
             "learning-rate":0.01,
-            "epoch-num":300,
+            "epoch-num":500,
             "load-model": false,
             "save-model": false
       },
@@ -30,9 +31,9 @@
           "pca-components": 17
       }
   },
-  "predict-result": {
-      "result1": "/home/lwt/bohaiwan/section_predict/result1",
-      "result2": "/home/lwt/bohaiwan/section_predict/result2"
+  "predict-result":{
+        "server":"/home/lwt/bohaiwan/section_predict/pred_result",
+        "local":"C:\\WorkSpace\\bohaiwan\\section_predict\\pred_result"
   },
   "device": {
     "use-gpu": true,

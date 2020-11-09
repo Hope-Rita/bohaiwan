@@ -31,11 +31,15 @@ class FusionBase(nn.Module):
     def forward(self, rnn_output, env_factor_vec):
         s, b, h = rnn_output.shape
         rnn_output = rnn_output.view(s * b, h)
+
+        if env_factor_vec.shape[1] > 1:  # 重复的环境数据
+            env_factor_vec = env_factor_vec[:, :1, :]
         env_factor_vec = env_factor_vec.view(env_factor_vec.shape[0] * env_factor_vec.shape[1], -1)
 
         x = torch.cat((rnn_output, env_factor_vec), dim=1)
         res = self.fc_fusion(x)
-        res = res.view(-1)
+        if res.shape[1] == 1:
+            res = res.view(-1)
         return res
 
     def name(self):

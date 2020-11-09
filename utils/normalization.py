@@ -1,5 +1,6 @@
 import numpy as np
 
+
 np.random.seed(1337)  # for reproducibility
 
 
@@ -48,6 +49,7 @@ class MinMaxNormal2(MinMaxNormal):
         x = (x + 1.0) / 2.0
         x = 1.0 * x * (self._max - self._min) + self._min
         return x
+
 
 def sigmoid(data):
     return 1.0 / (1 + np.exp(-data))
