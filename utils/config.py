@@ -33,6 +33,7 @@ class Config(object):
         self.__data_config_dict = json.load(f)
         f.close()
         self.__run_on_local = self.__config_dict['run-on-local']
+        self.__predict_target = self.get_data_loc(data_name=self.__config_dict['predict-target'])
 
     def modify_config(self, *keys, new_val):
         """
@@ -84,3 +85,7 @@ class Config(object):
     @property
     def data_path(self):
         return self.__data_path
+
+    @property
+    def predict_target(self):
+        return self.__predict_target

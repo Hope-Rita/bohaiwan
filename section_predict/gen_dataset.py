@@ -66,3 +66,14 @@ def get_section_members(section_name, cols):
     :return: 该 section 上所有成员的列表
     """
     return [col for col in cols if section_name in col]
+
+
+def get_section_sensor_num(filename, section_name):
+    """
+    得到某个 section 上传感器的数量
+    @param filename: 存储数据的文件名
+    @param section_name: 块号
+    @return: 传感器的数量
+    """
+    df = pd.read_csv(filename, index_col='date')
+    return len([col for col in df.columns if section_name in col])

@@ -9,6 +9,7 @@ from baseline.recurrent_fusion import RNNFusion, GRUFusion, LSTMFusion
 from baseline.recurrent_section_fusion import LSTMSectionFusion
 from utils import normalization
 from utils.metric import RMSELoss
+from section_predict.gen_dataset import get_section_sensor_num
 
 
 conf = Config()
@@ -106,8 +107,21 @@ def rnn_union_predict(x_train, y_train, x_test):
     return union_predict(model, x_train, y_train, x_test)
 
 
+def lstm_section_predict(x_train, y_train, x_test):
+    sensor_num = get_section_sensor_num(filename=conf.predict_target, section_name=conf.get_config('predict-section'))
+    model = LSTMFusion(time_series_len=pred_len, input_feature=sensor_num, output_size=sensor_num).to(device)
+    return section_union_predict(model, x_train, y_train, x_test)
+
+
+def gru_section_predict(x_train, y_train, x_test):
+    sensor_num = get_section_sensor_num(filename=conf.predict_target, section_name=conf.get_config('predict-section'))
+    model = GRUFusion(time_series_len=pred_len, input_feature=sensor_num, output_size=sensor_num).to(device)
+    return section_union_predict(model, x_train, y_train, x_test)
+
+
 def rnn_section_predict(x_train, y_train, x_test):
-    model = RNNFusion(time_series_len=pred_len, input_feature=16, output_size=16).to(device)
+    sensor_num = get_section_sensor_num(filename=conf.predict_target, section_name=conf.get_config('predict-section'))
+    model = RNNFusion(time_series_len=pred_len, input_feature=sensor_num, output_size=sensor_num).to(device)
     return section_union_predict(model, x_train, y_train, x_test)
 
 
