@@ -26,8 +26,8 @@ def adjust_para(filename, data, func):
     @param data: 数据
     @param func: 使用的模型
     """
-    hidden_size_range = range(5, 85, 5)
-    lr_range = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+    hidden_size_range = range(5, 165, 5)
+    lr_range = [0.003, 0.065, 0.01, 0.02, 0.03, 0.065, 0.1]
 
     res = []
     for hidden_size in hidden_size_range:
@@ -87,8 +87,7 @@ def predict_one_section(filename, data, func, dump_csv=True):
 
 
 if __name__ == '__main__':
-    pred_target = conf.get_config('predict-target')
-    pred_target_filename = conf.get_data_loc(pred_target)
+    pred_target_filename = conf.predict_target
     pred_data = gen_dataset.load_one_section(filename=pred_target_filename, section_name=pred_section)
     # predict_one_section(pred_target_filename, pred_data, recurrent.rnn_section_predict)
     adjust_para(pred_target_filename, pred_data, recurrent.lstm_section_predict)

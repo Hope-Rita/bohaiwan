@@ -1,5 +1,5 @@
 {
-    "predict-target":"taseometer-2020",
+    "predict-target":"taseometer",
     "predict-col":"FSS_S07_B3_007",
     "device":{
         "use-gpu": true,
@@ -18,14 +18,14 @@
     "model-parameters":{
         "recurrent":{
             "lstm-hidden-size":55,
-            "rnn-hidden-size":65,
-            "gru-hidden-size":40,
+            "rnn-hidden-size":15,
+            "gru-hidden-size":15,
             "num-workers":0,
             "batch-size":16,
-            "learning-rate":0.01,
+            "learning-rate":0.003,
             "epoch-num":300,
             "load-model": false,
-            "save-model": false
+            "save-model": true
         },
         "mlp":{
             "hidden-size": [32, 16, 8]
@@ -33,11 +33,11 @@
     },
     "predict-result":{
         "server":"/home/lwt/bohaiwan/union_predict/pred_result",
-        "local":"C:\\study\\WorkSpace\\bohaiwan\\union_predict\\pred_result"
+        "local":"C:\\WorkSpace\\bohaiwan\\union_predict\\pred_result"
     },
     "model-paras": {
         "server": "/home/lwt/bohaiwan/union_predict/model_paras",
-        "local": "C:\\study\\WorkSpace\\bohaiwan\\union_predict\\model_paras"
+        "local": "C:\\WorkSpace\\bohaiwan\\union_predict\\model_paras"
     },
-    "run-on-local": true
+    "run-on-local": false
 }

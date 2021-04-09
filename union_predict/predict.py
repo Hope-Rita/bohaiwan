@@ -2,6 +2,7 @@ import numpy as np
 import platform
 
 from utils.config import Config
+
 config_path = '../union_predict/config.json'
 conf = Config(config_path)
 
@@ -163,17 +164,15 @@ def all_cols_future_predict(filename, func):
 if __name__ == '__main__':
     # 存放预测结果文件的路径
     pred_res_dir = conf.get_config('predict-result', 'server')
-
-    pred_target = conf.get_config('predict-target')
-    pred_target_filename = conf.get_data_loc(pred_target)
+    pred_target_filename = conf.predict_target
     pred_col = conf.get_config('predict-col')
 
     # cross_validation(pred_target_filename, lr.lr_predict)
     # one_col_cross_validation(pred_target_filename, pred_col, lr.lr_predict)
     # analysis_all_cols(pred_target_filename, recurrent.rnn_union_predict)
     # predict_one_col(pred_target_filename, pred_col, recurrent.rnn_union_predict, is_draw_pic=False)
-    # target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
-    # predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
+    target_data = gen_dataset.load_cols(pred_target_filename, random_pick=False)
+    predict_one_cols(recurrent.rnn_union_predict, target_data, pred_target_filename)
     # classical_models(pred_target_filename)
     # future_predict(pred_target_filename, recurrent.rnn_union_predict, pred_col)
-    all_cols_future_predict(pred_target_filename, recurrent.rnn_union_predict)
+    # all_cols_future_predict(pred_target_filename, recurrent.rnn_union_predict)

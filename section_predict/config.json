@@ -15,7 +15,7 @@
         "recurrent": {
             "lstm-hidden-size": 55,
             "rnn-hidden-size": 15,
-            "gru-hidden-size": 40,
+            "gru-hidden-size": 15,
             "num-workers": 0,
             "batch-size": 16,
             "learning-rate": 0.01,
@@ -37,7 +37,7 @@
     },
     "device": {
         "use-gpu": true,
-        "cuda": "cuda:1"
+        "cuda": "cuda:3"
     },
     "model-paras": {
         "server": "/home/lwt/bohaiwan/union_predict/model_paras",

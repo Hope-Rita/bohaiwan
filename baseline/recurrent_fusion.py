@@ -48,11 +48,14 @@ class FusionBase(nn.Module):
 
 class RNNFusion(FusionBase):
 
-    def __init__(self, time_series_len, input_feature, hidden_size=rnn_hidden_size, output_size=1):
+    def     __init__(self, time_series_len, input_feature, hidden_size=rnn_hidden_size, output_size=1):
         super(RNNFusion, self).__init__(time_series_len, hidden_size, output_size)
         self.rnn = nn.RNN(input_size=input_feature, hidden_size=hidden_size)
 
     def forward(self, input_x, _=None):
+        """
+        input_x in shape (batch, feature, (seq_len + env_factor_num))
+        """
         x = input_x[:, :, :self.time_series_len]
         x = x.permute(2, 0, 1)
         e = input_x[:, :, self.time_series_len:]
