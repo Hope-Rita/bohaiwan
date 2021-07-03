@@ -99,7 +99,7 @@ def cross_validation(filename, func, k=10):
 
 def predict_one_col(filename, col, func, is_draw_pic=True):
     """
-    使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检查测试
+    使用指定的模型对某一列的数据进行预测, 用于对存在异常的数据进行检·查测试
     :param filename: 存放数据的 CSV 文件
     :param col: 预测的列号
     :param func: 预测用的模型
@@ -165,6 +165,7 @@ if __name__ == '__main__':
     # 存放预测结果文件的路径
     pred_res_dir = conf.get_config('predict-result', 'server')
     pred_target_filename = conf.predict_target
+    print(pred_target_filename)
     pred_col = conf.get_config('predict-col')
 
     # cross_validation(pred_target_filename, lr.lr_predict)

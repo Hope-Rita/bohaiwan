@@ -3,7 +3,7 @@
     "predict-col":"FSS_S07_B3_007",
     "device":{
         "use-gpu": true,
-        "cuda":"cuda:0"
+        "cuda":"cuda:1"
     },
     "data-parameters":{
         "pred-len":14,
@@ -32,11 +32,11 @@
         }
     },
     "predict-result":{
-        "server":"/home/lwt/bohaiwan/union_predict/pred_result",
+        "server":"/home/zoutao/bohaiwan/union_predict/pred_result",
         "local":"C:\\WorkSpace\\bohaiwan\\union_predict\\pred_result"
     },
     "model-paras": {
-        "server": "/home/lwt/bohaiwan/union_predict/model_paras",
+        "server": "/home/zoutao/bohaiwan/union_predict/model_paras",
         "local": "C:\\WorkSpace\\bohaiwan\\union_predict\\model_paras"
     },
     "run-on-local": false

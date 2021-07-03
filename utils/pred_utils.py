@@ -70,7 +70,7 @@ def predict_one_cols(func, data):
         y_train = normal_y.transform(y_train)
 
         # 调用模型进行预测，得到预测结果
-        pred = func(x_train=x_train, y_train=y_train, x_test=x_test)
+        pred = func(x_train=x_train, y_train=y_train, x_test=x_test, column=column)
 
         # 将预测结果与测试集进行比较，得到评估指标
         pred = pred.reshape(-1)

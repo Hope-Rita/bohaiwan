@@ -1,46 +1,46 @@
 {
   "taseometer": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\taseometer.csv",
-      "server": "/home/lwt/bohaiwan/data/taseometer.csv"
+      "server": "/home/zoutao/bohaiwan/data/taseometer.csv"
   },
   "taseometer-full": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\taseometer-full.csv",
-      "server": "/home/lwt/bohaiwan/data/taseometer-full.csv"
+      "server": "/home/zoutao/bohaiwan/data/taseometer-full.csv"
   },
   "taseometer-debug": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\taseometer-debug.csv",
-      "server": "/home/lwt/bohaiwan/data/taseometer-debug.csv"
+      "server": "/home/zoutao/bohaiwan/data/taseometer-debug.csv"
   },
   "taseometer-pro": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\taseometer-pro.csv",
-      "server": "/home/lwt/bohaiwan/data/taseometer-pro.csv"
+      "server": "/home/zoutao/bohaiwan/data/taseometer-pro.csv"
   },
   "taseometer-2020": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\taseometer-2020.csv",
-      "server": "/home/lwt/bohaiwan/data/taseometer-2020.csv"
+      "server": "/home/zoutao/bohaiwan/data/taseometer-2020.csv"
   },
   "strainmeter": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\strainmeter.csv",
-      "server": "/home/lwt/bohaiwan/data/strainmeter.csv"
+      "server": "/home/zoutao/bohaiwan/data/strainmeter.csv"
   },
   "weather": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\weather.csv",
-      "server": "/home/lwt/bohaiwan/data/weather.csv"
+      "server": "/home/zoutao/bohaiwan/data/weather.csv"
   },
   "waterline": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\waterline.csv",
-      "server": "/home/lwt/bohaiwan/data/waterline.csv"
+      "server": "/home/zoutao/bohaiwan/data/waterline.csv"
   },
   "temperature": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\temperature.csv",
-      "server": "/home/lwt/bohaiwan/data/temperature.csv"
+      "server": "/home/zoutao/bohaiwan/data/temperature.csv"
   },
   "pressure": {
       "local": "C:\\WorkSpace\\bohaiwan\\data\\pressure.csv",
-      "server": "/home/lwt/bohaiwan/data/pressure.csv"
+      "server": "/home/zoutao/bohaiwan/data/pressure.csv"
   },
   "col-match": {
     "local": "C:\\WorkSpace\\bohaiwan\\env_factors\\col_matched.json",
-    "server": "/home/lwt/bohaiwan/env_factors/col_matched.json"
+    "server": "/home/zoutao/bohaiwan/env_factors/col_matched.json"
   }
 }

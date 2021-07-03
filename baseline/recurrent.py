@@ -39,7 +39,7 @@ pred_len, env_factor_num = conf.get_config('data-parameters', inner_keys=['pred-
 para_save_path = conf.get_config('model-paras', 'local' if conf.get_config('run-on-local') else 'server')
 
 
-def union_predict(model, x_train, y_train, x_test):
+def union_predict(model, x_train, y_train, x_test, column):
     """
     使用循环神经网络模型来进行联合预测
     @param model: 使用的具体模型
@@ -57,7 +57,7 @@ def union_predict(model, x_train, y_train, x_test):
         model.load_state_dict(torch.load(path))
         print(f'从{path}处加载模型参数')
     else:  # 训练模型
-        model = train_model(model, data_loader)
+        model = train_model(model, data_loader, column)
 
     # 将输出的结果进行处理并返回
     pred = model(x_test)
@@ -102,9 +102,9 @@ def gru_union_predict(x_train, y_train, x_test):
     return union_predict(model, x_train, y_train, x_test)
 
 
-def rnn_union_predict(x_train, y_train, x_test):
+def rnn_union_predict(x_train, y_train, x_test, column):
     model = RNNFusion(time_series_len=pred_len, input_feature=1).to(device)
-    return union_predict(model, x_train, y_train, x_test)
+    return union_predict(model, x_train, y_train, x_test, column)
 
 
 def lstm_section_predict(x_train, y_train, x_test):
@@ -138,7 +138,7 @@ def lstm_predict(x_train, y_train, x_test):
     return normal.inverse_transform(pred)
 
 
-def train_model(model, data_loader):
+def train_model(model, data_loader, column):
     rmse = RMSELoss()
     opt = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=2, threshold=1e-3, min_lr=1e-6)
@@ -175,7 +175,7 @@ def train_model(model, data_loader):
 
     if save_model:  # 保存模型
         col = conf.get_config('predict-col')
-        path = f'{para_save_path}/{col}_{model.name()}.pkl'
+        path = f'{para_save_path}/{column}_{model.name()}.pkl'
         torch.save(model.state_dict(), path)
         print(f'模型参数已存储到{path}')
 
